@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #4F46E5;
+  /* Indigo 600 */
+  --primary-hover: #4338CA;
+  /* Indigo 700 */
+  --bg-body: #F3F4F6;
+  /* Gray 100 */
+  --bg-card: #FFFFFF;
+  --text-main: #111827;
+  /* Gray 900 */
+  --text-muted: #6B7280;
+  /* Gray 500 */
+  --border: #E5E7EB;
+  /* Gray 200 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Layout */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-logo {
+  height: 32px;
+  width: auto;
+}
+
+.navbar-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+}
+
+.app-container {
+  max-width: 800px;
+  width: 90%;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.app-header p {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Card & Content */
+.main-content {
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+/* Form Elements */
+.task-input-container {
+  margin-bottom: 2rem;
+}
+
+.task-form {
+  display: flex;
+  gap: 1rem;
+}
+
+.task-input {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background-color: #F9FAFB;
+}
+
+.task-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.generate-btn {
+  padding: 0.875rem 1.5rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Todo List */
+.todo-list-container h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--bg-body);
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.todo-item:hover {
+  border-color: #D1D5DB;
+  box-shadow: var(--shadow-sm);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: useState;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkbox-container input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.checkmark {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #D1D5DB;
+  border-radius: 0.35rem;
+  margin-right: 1rem;
+  margin-top: 0.15rem;
+  /* Align with text roughly */
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-container input:checked~.checkmark {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox-container input:focus~.checkmark {
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.checkmark:after {
+  content: "";
+  display: none;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.checkbox-container input:checked~.checkmark:after {
+  display: block;
+}
+
+.todo-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  transition: color 0.2s;
+}
+
+.checkbox-container input:checked~.todo-text {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.error-message {
+  background-color: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #B91C1C;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* Value Props / Features specific to TaskPulse? 
+   Maybe add some background elements or gradient blobs 
+   if requested, but sticking to clean premium for now. */
+
+@media (max-width: 640px) {
+  .app-container {
+    width: 95%;
+    margin: 2rem auto;
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .task-form {
+    flex-direction: column;
+  }
+
+  .generate-btn {
+    width: 100%;
+  }
+}
