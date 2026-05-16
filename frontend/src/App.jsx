@@ -4,6 +4,7 @@ import TaskInput from './components/TaskInput'
 import TodoList from './components/TodoList'
 import axios from 'axios'
 import logo from './assets/Navbar_logo.png'
+import LandingPage from './pages/LandingPage'
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -28,6 +29,7 @@ function App() {
   };
 
   return (
+    // <LandingPage/>
     <div className="app-wrapper">
       <nav className="navbar">
         <div className="navbar-brand">
