@@ -1,9 +1,13 @@
+import LandingPageSCard from "../components/LandingpageScard";
+import LandingpageLcard from "../components/LandingpageLcard";
+import LandingpageBLcard from "../components/LandingpageBLcard";
+
 function LandingPage(){
 
   return (
     <div className="w-full min-h-screen bg-grey  text-center pt-20 font-sans">
       <div className="flex justify-center w-full">
-        <div className="w-fit border border-blue-500 bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-lg mb-10">
+        <div className="w-fit border border-blue-500 bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-full mb-10">
           AI-powered 4-year college roadmap 
         </div>
       </div>
@@ -28,7 +32,39 @@ function LandingPage(){
           See a demo
         </button>
       </div>
+      <div className="flex justify-center mt-10 mb-10 ">
+      <LandingPageSCard upperValue="4 yrs" lowerValue="Planned on Day 1"/>
+      <LandingPageSCard upperValue="AI" lowerValue="Adapts as you grow"/>
+      <LandingPageSCard upperValue="1 place" lowerValue="Your whole journey"/>
 
+      </div>
+      <p className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">what you get</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-50 mt-5">
+      <LandingpageLcard uppertext="AI onboarding oracle" lowertext="10 minutes. Stride learns your goals and generates your entire 4-year roadmap instantly."/>
+      <LandingpageLcard uppertext="Living roadmap" lowertext="Your plan adapts every semester as your skills grow and your goals evolve."/>
+      <LandingpageLcard uppertext="Evidence vault" lowertext="Log every project, internship, and win. AI turns it into your career story at graduation."/>
+      <LandingpageLcard uppertext="Weekly AI check-in" lowertext="Every Sunday, your AI reviews your week and recalibrates next week's priorities."/>
+      </div>
+      <p className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">How it works</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-50 mt-5">
+        <LandingpageBLcard 
+        uppertext="Tell us your goals" 
+        lowertext="Answer 5 questions about your branch, dream outcome, and skill level."/>
+        <LandingpageBLcard 
+        uppertext="Get your roadmap" 
+        lowertext="AI generates a semester-by-semester plan with milestones tailored to you."/>
+        <LandingpageBLcard 
+        uppertext="Check in weekly" 
+        lowertext="Mark milestones done. AI adjusts the plan and keeps you on track."/>
+        <LandingpageBLcard 
+        uppertext="Graduate ready" 
+        lowertext="Your vault becomes a portfolio. AI writes your career narrative automatically."/>
+      </div>
+      <div className="border border-blue-400 bg-blue-200 p-5 mx-50 mt-10 mb-10 rounded-lg">
+        <h2 className="text-black text-2xl m-5">Start your roadmap today</h2>
+        <p>Free for students. No credit card. No fluff.</p>
+        <button className="text-black border border-black rounded-md font-bold p-2 mt-3">Create my account</button>
+      </div>
     </div>
   );
 }
