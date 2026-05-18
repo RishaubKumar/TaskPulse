@@ -1,11 +1,15 @@
 import LandingPageSCard from "../components/LandingpageScard";
 import LandingpageLcard from "../components/LandingpageLcard";
 import LandingpageBLcard from "../components/LandingpageBLcard";
+import Navbar from "../components/layout/Navbar";
 
 function LandingPage(){
 
   return (
-    <div className="w-full min-h-screen bg-grey  text-center pt-20 font-sans">
+    <>
+    <Navbar/>
+    <hr className="border-t border-gray-300"/>
+    <div className="w-full min-h-screen bg-gray  text-center pt-20 font-sans">
       <div className="flex justify-center w-full">
         <div className="w-fit border border-blue-500 bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-full mb-10">
           AI-powered 4-year college roadmap 
@@ -38,25 +42,29 @@ function LandingPage(){
       <LandingPageSCard upperValue="1 place" lowerValue="Your whole journey"/>
 
       </div>
-      <p className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">what you get</p>
+      <p id="features" className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">what you get</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-50 mt-5">
       <LandingpageLcard uppertext="AI onboarding oracle" lowertext="10 minutes. Stride learns your goals and generates your entire 4-year roadmap instantly."/>
       <LandingpageLcard uppertext="Living roadmap" lowertext="Your plan adapts every semester as your skills grow and your goals evolve."/>
       <LandingpageLcard uppertext="Evidence vault" lowertext="Log every project, internship, and win. AI turns it into your career story at graduation."/>
       <LandingpageLcard uppertext="Weekly AI check-in" lowertext="Every Sunday, your AI reviews your week and recalibrates next week's priorities."/>
       </div>
-      <p className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">How it works</p>
+      <p id="how-it-works"  className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">How it works</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-50 mt-5">
         <LandingpageBLcard 
+        icon = "1"
         uppertext="Tell us your goals" 
         lowertext="Answer 5 questions about your branch, dream outcome, and skill level."/>
         <LandingpageBLcard 
+        icon = "2"
         uppertext="Get your roadmap" 
         lowertext="AI generates a semester-by-semester plan with milestones tailored to you."/>
         <LandingpageBLcard 
+        icon="3"
         uppertext="Check in weekly" 
         lowertext="Mark milestones done. AI adjusts the plan and keeps you on track."/>
         <LandingpageBLcard 
+        icon="4"
         uppertext="Graduate ready" 
         lowertext="Your vault becomes a portfolio. AI writes your career narrative automatically."/>
       </div>
@@ -66,6 +74,15 @@ function LandingPage(){
         <button className="text-black border border-black rounded-md font-bold p-2 mt-3">Create my account</button>
       </div>
     </div>
+    <hr className="border-t border-gray-300"/>
+    <div className="flex justify-evenly p-3">
+      <div className=" font tracking-tight text-gray-900 ">
+        task<span className="text-blue-800">pulse</span>
+      </div>
+      <p>Built for college students</p>
+      <p>Privacy · Terms</p>
+    </div>
+    </>
   );
 }
 

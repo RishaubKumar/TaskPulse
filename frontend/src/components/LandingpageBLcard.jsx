@@ -1,9 +1,10 @@
 function LandingpageBLcard({icon,uppertext,lowertext}){
     return(
-        <div className=" p-2 ">
-            <div className="inline rounded-full bg-blue-800">{icon}</div>
-            <h3 className="text-left text-black font-bold">{uppertext}</h3>
+        <div className=" flex items-start gap-4 p-4 max-w-md">
+            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 rounded-full bg-indigo-700 text-white font-bold text-base">{icon}</div>
+           <div className='flex flex-col pt-1'> <h3 className="inline text-left text-black font-bold">{uppertext}</h3>
             <p className="text-left">{lowertext}</p>
+            </div>
         </div>
     );
 }
