@@ -6,6 +6,7 @@ import axios from 'axios'
 import logo from './assets/Navbar_logo.png'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/RegisterPage'
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -32,6 +33,7 @@ function App() {
   return (
     // <LoginPage/>
     // <LandingPage/>
+    // <SignupPage/>
     <div className="app-wrapper">
       <nav className="navbar">
         <div className="navbar-brand">
