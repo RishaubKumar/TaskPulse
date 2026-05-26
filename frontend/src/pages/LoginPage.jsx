@@ -1,5 +1,6 @@
 import LandingPageCard from "../components/LandingpageScard";
 import ReviewCard from "../components/ReviewCard";
+import { Link } from "react-router-dom";
 function LoginPage() {
     return (
         <>
@@ -17,13 +18,13 @@ function LoginPage() {
 
                 <div className="bg-white text-gray-900  p-15">
           <div className="flex border rounded-lg overflow-hidden w-fit mb-6">
-            <button className="px-5 py-2 text-gray-500  text-sm">
+            <Link to="/signup" className=" btn px-5 py-2 text-gray-500  text-sm">
               Register
-            </button>
+            </Link>
 
-            <button className="px-5 py-2 bg-[#534AB7] text-white text-sm ">
+            <Link to="/login" className=" btn px-5 py-2 bg-[#534AB7] text-white text-sm ">
               Log in
-            </button>
+            </Link>
           </div>
                     <h1 className="text-3xl text-left font-sans mt-10 mb-2">Log in to TaskPulse</h1>
                     <p>Continue building your story.</p>

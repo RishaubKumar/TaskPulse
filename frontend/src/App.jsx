@@ -7,6 +7,8 @@ import logo from './assets/Navbar_logo.png'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/RegisterPage'
+import { Routes, Route } from 'react-router-dom'
+
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -31,32 +33,37 @@ function App() {
   };
 
   return (
-    // <LoginPage/>
-    // <LandingPage/>
-    // <SignupPage/>
-    <div className="app-wrapper">
-      <nav className="navbar">
-        <div className="navbar-brand">
-          <img src={logo} alt="TaskPulse Logo" className="navbar-logo" />
-          <span className="navbar-title">TaskPulse</span>
+    <Routes>
+      <Route path='/' element={<LandingPage />}></Route>
+      <Route path='/login' element={<LoginPage />}></Route>
+      <Route path='/signup' element={<SignupPage />}></Route>
+      <Route path='/old' element={
+        <div className="app-wrapper">
+          <nav className="navbar">
+            <div className="navbar-brand">
+              <img src={logo} alt="TaskPulse Logo" className="navbar-logo" />
+              <span className="navbar-title">TaskPulse</span>
+            </div>
+          </nav>
+
+          <div className="app-container">
+            <header className="app-header">
+              <h1>Turn Goals into Action</h1>
+              <p>AI-powered task breakdown for maximum productivity</p>
+            </header>
+
+            <main className="main-content">
+              <TaskInput onGenerate={handleGenerateValues} isLoading={loading} />
+
+              {error && <div className="error-message">{error}</div>}
+
+              <TodoList todos={todos} />
+            </main>
+          </div>
         </div>
-      </nav>
+      }></Route>
+    </Routes>
 
-      <div className="app-container">
-        <header className="app-header">
-          <h1>Turn Goals into Action</h1>
-          <p>AI-powered task breakdown for maximum productivity</p>
-        </header>
-
-        <main className="main-content">
-          <TaskInput onGenerate={handleGenerateValues} isLoading={loading} />
-
-          {error && <div className="error-message">{error}</div>}
-
-          <TodoList todos={todos} />
-        </main>
-      </div>
-    </div>
   )
 }
 

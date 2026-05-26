@@ -2,6 +2,7 @@ import LandingPageSCard from "../components/LandingpageScard";
 import LandingpageLcard from "../components/LandingpageLcard";
 import LandingpageBLcard from "../components/LandingpageBLcard";
 import Navbar from "../components/layout/Navbar";
+import { Link } from "react-router-dom";
 
 function LandingPage(){
 
@@ -28,9 +29,9 @@ function LandingPage(){
       </p>
 
       <div className="flex justify-center gap-5">
-        <button className="bg-black hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg text-md shadow-md">
+        <Link to="/signup" className=" btn bg-black hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg text-md shadow-md">
           Build my roadmap — free
-        </button>
+        </Link>
         
         <button className="bg-white hover:bg-gray-100 text-black font-bold py-3 px-6 rounded-lg border border-gray-400 text-md shadow-sm">
           See a demo
@@ -70,8 +71,8 @@ function LandingPage(){
       </div>
       <div className="border border-blue-400 bg-blue-200 p-5 mx-50 mt-10 mb-10 rounded-lg">
         <h2 className="text-black text-2xl m-5">Start your roadmap today</h2>
-        <p>Free for students. No credit card. No fluff.</p>
-        <button className="text-black border border-black rounded-md font-bold p-2 mt-3">Create my account</button>
+        <p className="mb-2">Free for students. No credit card. No fluff.</p>
+        <Link to="/signup" className=" btn text-black border border-black rounded-md font-bold p-2 mt-3">Create my account</Link>
       </div>
     </div>
     <hr className="border-t border-gray-300"/>

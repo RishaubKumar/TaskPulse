@@ -1,3 +1,4 @@
+import {Link} from "react-router-dom"
 function SignupPage() {
   return (
     <>
@@ -84,13 +85,13 @@ function SignupPage() {
 
         <div className="p-8 overflow-y-auto bg-white">
           <div className="flex border rounded-lg overflow-hidden w-fit mb-6">
-            <button className="px-5 py-2 bg-[#534AB7] text-white text-sm">
+            <Link to="/signup" className="  btn px-5 py-2 bg-[#534AB7] text-white text-sm" >
               Register
-            </button>
+            </Link>
 
-            <button className="px-5 py-2 text-sm text-gray-500">
+            <Link to="/login" className=" btn px-5 py-2 text-gray-500  text-sm">
               Log in
-            </button>
+            </Link>
           </div>
           <h1 className="text-2xl font-semibold mb-1">
             Create your account
