@@ -1,7 +1,18 @@
+import { useState } from "react";
 import LandingPageCard from "../components/LandingpageScard";
 import ReviewCard from "../components/ReviewCard";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function LoginPage() {
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        // TODO: replace with real authentication logic
+        navigate("/progress");
+    };
+
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen ">
@@ -28,15 +39,34 @@ function LoginPage() {
           </div>
                     <h1 className="text-3xl text-left font-sans mt-10 mb-2">Log in to TaskPulse</h1>
                     <p>Continue building your story.</p>
-                    <label htmlFor="emailInput" className="flex text-bold mt-5 mb-2">Email address</label>
-                    <input className="w-full border rounded-lg px-4 py-3 outline-none" type="email" id="emailInput" placeholder="priya123@college.edu.in" />
+                    <form onSubmit={handleSubmit}>
+                        <label htmlFor="emailInput" className="flex text-bold mt-5 mb-2">Email address</label>
+                        <input
+                            className="w-full border rounded-lg px-4 py-3 outline-none"
+                            type="email"
+                            id="emailInput"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="priya123@college.edu.in"
+                        />
 
-                    <label htmlFor="passInput" className="flex text-bold mt-8 mb-2">Password</label>
-                    <input className="w-full border rounded-lg px-4 py-3 outline-none" type="password" id="passInput" placeholder=" Your Password " />
-                    <p className="text-right">forgot password ?</p>
-                    <button className="w-full border rounded-lg mt-5 py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition">
-                        Log in
-                    </button>
+                        <label htmlFor="passInput" className="flex text-bold mt-8 mb-2">Password</label>
+                        <input
+                            className="w-full border rounded-lg px-4 py-3 outline-none"
+                            type="password"
+                            id="passInput"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder=" Your Password "
+                        />
+                        <p className="text-right">forgot password ?</p>
+                        <button
+                            type="submit"
+                            className=" btn w-full border rounded-lg mt-5 py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition"
+                        >
+                            Log in
+                        </button>
+                    </form>
                     <div className="flex items-center gap-3 my-5 text-sm text-gray-400">
                         <div className="flex-1 h-px bg-gray-200"></div>
                         or

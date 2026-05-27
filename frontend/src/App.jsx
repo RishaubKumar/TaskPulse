@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './App.css'
+// import './App.css'
 import TaskInput from './components/TaskInput'
 import TodoList from './components/TodoList'
 import axios from 'axios'
@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/RegisterPage'
 import { Routes, Route } from 'react-router-dom'
+import ProgressBar from './components/onboarding/ProgressBar'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path='/progress' element={<ProgressBar/>}></Route>
       <Route path='/' element={<LandingPage />}></Route>
       <Route path='/login' element={<LoginPage />}></Route>
       <Route path='/signup' element={<SignupPage />}></Route>
