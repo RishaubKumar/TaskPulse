@@ -4,14 +4,14 @@ function SignupPage() {
     <>
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
 
-        <div className="bg-[#26215C] p-10 flex flex-col text-white">
+        <div className="bg-blue-600  p-10 flex flex-col text-white">
 
           <div className="text-xl font-semibold mb-8">
-            task<span className="text-[#7F77DD]">pulse</span>
+            task<span className="text-white">pulse</span>
           </div>
 
           <div className="flex-1">
-            <p className="text-sm text-[#AFA9EC] mb-6">
+            <p className="text-sm text-white mb-6">
               What happens after you register
             </p>
 
@@ -25,28 +25,28 @@ function SignupPage() {
                   <h4 className="text-sm font-medium">
                     Create your account
                   </h4>
-                  <p className="text-xs text-[#AFA9EC]">
+                  <p className="text-xs text-white">
                     30 seconds. Free forever, no credit card.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-[#534AB7] flex items-center justify-center text-sm">
+                <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-sm">
                   2
                 </div>
                 <div>
                   <h4 className="text-sm font-medium">
                     AI onboarding — 5 questions
                   </h4>
-                  <p className="text-xs text-[#AFA9EC]">
+                  <p className="text-xs text-white">
                     Tell us your goal, branch, and skill level.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-white/20 text-[#AFA9EC] flex items-center justify-center text-sm">
+                <div className="w-7 h-7 rounded-full bg-white/20 text-black flex items-center justify-center text-sm">
                   3
                 </div>
                 <div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProgressCard from "./ProgressCard";
+import CommentCard from "./CommentCard";
 
 function StepTwo() {
 
@@ -8,7 +9,7 @@ function StepTwo() {
   return (
     <>
       <div className="m-5">
-
+        <CommentCard comment="Great! Now the big question — what does success look like for you after graduation? Be honest, there are no wrong answers." />
         <h1 className="inline text-left text-black font-bold text-3xl">
           What's your primary goal?
         </h1>

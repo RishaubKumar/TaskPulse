@@ -15,7 +15,7 @@ function ProgressBar() {
     <div className="text-xl font-bold tracking-tight text-gray-900 select-none">
         task<span className="text-blue-800">pulse</span>
       </div>
-    <div>Step {index} of 5</div>
+    <div>Step {index+1} of 5</div>
     </div>
 
       <div className=" h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -29,10 +29,10 @@ function ProgressBar() {
         <div className="mb-5 ">
             {components[index]}
         </div>
-      <div className="flex space-x-250 p-10">
+      <div className="flex space-x-250 p-3">
         <button
           onClick={() => setIndex(Math.max(index - 1, 0))}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg"
+          className="px-4 py-2 bg-black text-white rounded-lg"
         >
           Previous
         </button>
@@ -41,7 +41,7 @@ function ProgressBar() {
           onClick={() =>
             setIndex(Math.min(index + 1, components.length - 1))
           }
-          className="px-4 py-2 bg-green-500 text-white rounded-lg"
+          className="px-4 py-2 bg-black text-white rounded-lg"
         >
           Next
         </button>

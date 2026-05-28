@@ -16,7 +16,7 @@ function LoginPage() {
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen ">
-                <div className="bg-[#241E56] text-white  p-15">
+                <div className="bg-blue-600 text-white  p-15">
                     <div className="text-3xl font-bold tracking-tight text-left text-gray-900 select-none">
                         task<span className="text-blue-800">pulse</span>
                     </div>

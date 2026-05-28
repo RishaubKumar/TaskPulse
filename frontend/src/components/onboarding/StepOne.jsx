@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProgressCard from "./ProgressCard";
+import CommentCard from "./CommentCard";
 
 function StepOne() {
 
@@ -8,7 +9,7 @@ function StepOne() {
   return (
     <>
       <div className="m-5">
-
+        <CommentCard comment="Hey! I'm your TaskPulse AI. I'll ask you 5 quick questions and build your personalised 4-year roadmap. What are you studying?"/>
         <h1 className="inline text-left text-black font-bold text-3xl">
           What's your branch?
         </h1>

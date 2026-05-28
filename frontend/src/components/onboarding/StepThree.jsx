@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProgressCard from "./ProgressCard";
+import CommentCard from "./CommentCard";
 
 function StepThree() {
 
@@ -8,7 +9,7 @@ function StepThree() {
   return (
     <>
       <div className="m-5">
-
+        <CommentCard comment="Perfect. Let me understand where you are today so your roadmap starts at exactly the right point — not too easy, not overwhelming."/>
         <h1 className="inline text-left text-black font-bold text-3xl">
          What's your current programming level?
         </h1>
