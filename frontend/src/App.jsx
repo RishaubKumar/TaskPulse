@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/RegisterPage'
 import { Routes, Route } from 'react-router-dom'
 import ProgressBar from './components/onboarding/ProgressBar'
+import NotFoundPage from './pages/NotFoundPage'
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path='/notfound' element={<NotFoundPage/>}></Route>
       <Route path='/progress' element={<ProgressBar/>}></Route>
       <Route path='/' element={<LandingPage />}></Route>
       <Route path='/login' element={<LoginPage />}></Route>
