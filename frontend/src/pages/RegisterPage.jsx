@@ -1,6 +1,6 @@
-import {Link} from "react-router-dom"
+import {Link , useNavigate} from "react-router-dom"
 import axios from'axios'
-import {useState} from 'react'
+import {useState} from 'react' 
 
 function SignupPage() {
   const [firstName,setFirstName] = useState()
@@ -12,10 +12,13 @@ function SignupPage() {
   const [gYear,setGYear] = useState()
   const [password,setPassword] = useState()
 
+  const navigate = useNavigate();
   const handleSubmit = (e) =>{
     e.preventDefault()
     axios.post('http://localhost:5000/register',{firstName, lastName, email, collegeName, branch,currentYear,gYear,password})
-    .then(result => console.log(result))
+    .then(result => {console.log(result)
+      navigate("/progress")
+  })
     .catch(err => console.log(err))
   }
   return (
@@ -201,7 +204,7 @@ function SignupPage() {
               </label>
 
               <select className="w-full border rounded-lg px-4 py-3 outline-none"
-              onChange={(e)=> setCurrentYear(e.target.value)}>
+              onChange={(e)=> setcurrentYear(e.target.value)}>
                 <option>Select year</option>
                 <option>Year 1</option>
                 <option>Year 2</option>

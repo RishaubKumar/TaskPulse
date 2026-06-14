@@ -2,16 +2,21 @@ import { useState } from "react";
 import LandingPageCard from "../components/LandingpageScard";
 import ReviewCard from "../components/ReviewCard";
 import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+
 function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // TODO: replace with real authentication logic
-        navigate("/progress");
-    };
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    axios.post('http://localhost:5000/login',{email,password})
+    .then(result => {console.log(result)
+      navigate("/dash")
+  })
+    .catch(err => console.log(err))
+  }
 
     return (
         <>

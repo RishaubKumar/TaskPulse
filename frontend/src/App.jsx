@@ -10,7 +10,7 @@ import SignupPage from './pages/RegisterPage'
 import { Routes, Route } from 'react-router-dom'
 import ProgressBar from './components/onboarding/ProgressBar'
 import NotFoundPage from './pages/NotFoundPage'
-
+import Dash from './components/dashboard/dash'
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -41,6 +41,8 @@ function App() {
       <Route path='/' element={<LandingPage />}></Route>
       <Route path='/login' element={<LoginPage />}></Route>
       <Route path='/signup' element={<SignupPage />}></Route>
+      <Route path='/dash' element={<Dash />}></Route>
+
       <Route path='/old' element={
         <div className="app-wrapper">
           <nav className="navbar">
