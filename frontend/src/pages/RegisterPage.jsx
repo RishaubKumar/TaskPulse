@@ -1,5 +1,23 @@
 import {Link} from "react-router-dom"
+import axios from'axios'
+import {useState} from 'react'
+
 function SignupPage() {
+  const [firstName,setFirstName] = useState()
+  const [lastName,setLastName] = useState()
+  const [email,setEmail] = useState()
+  const [collegeName,setCollegeName] = useState()
+  const [branch,setBranch] = useState()
+  const [currentYear,setcurrentYear] = useState()
+  const [gYear,setGYear] = useState()
+  const [password,setPassword] = useState()
+
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    axios.post('http://localhost:5000/register',{firstName, lastName, email, collegeName, branch,currentYear,gYear,password})
+    .then(result => console.log(result))
+    .catch(err => console.log(err))
+  }
   return (
     <>
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
@@ -100,7 +118,7 @@ function SignupPage() {
           <p className="text-sm text-gray-500 mb-6">
             Join and get your 4-year roadmap in under 5 minutes.
           </p>
-
+          <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
             <div>
@@ -112,6 +130,7 @@ function SignupPage() {
                 type="text"
                 placeholder="Rahul"
                 className="w-full border rounded-lg px-4 py-3 outline-none"
+                onChange={(e)=>setFirstName(e.target.value)}
               />
             </div>
 
@@ -124,6 +143,7 @@ function SignupPage() {
                 type="text"
                 placeholder="Kumar"
                 className="w-full border rounded-lg px-4 py-3 outline-none"
+                onChange={(e)=>setLastName(e.target.value)}
               />
             </div>
 
@@ -137,6 +157,7 @@ function SignupPage() {
               type="email"
               placeholder="rahul@college.edu.in"
               className="w-full border rounded-lg px-4 py-3 outline-none"
+              onChange={(e)=>setEmail(e.target.value)}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -150,6 +171,7 @@ function SignupPage() {
                 type="text"
                 placeholder="VIT Vellore"
                 className="w-full border rounded-lg px-4 py-3 outline-none"
+                onChange={(e)=> setCollegeName(e.target.value)}
               />
             </div>
 
@@ -158,7 +180,8 @@ function SignupPage() {
                 Branch
               </label>
 
-              <select className="w-full border rounded-lg px-4 py-3 outline-none">
+              <select className="w-full border rounded-lg px-4 py-3 outline-none" 
+              onChange={(e)=> setBranch(e.target.value)}>
                 <option>Select branch</option>
                 <option>Computer science / IT</option>
                 <option>Electronics / ECE</option>
@@ -177,7 +200,8 @@ function SignupPage() {
                 Current year
               </label>
 
-              <select className="w-full border rounded-lg px-4 py-3 outline-none">
+              <select className="w-full border rounded-lg px-4 py-3 outline-none"
+              onChange={(e)=> setCurrentYear(e.target.value)}>
                 <option>Select year</option>
                 <option>Year 1</option>
                 <option>Year 2</option>
@@ -191,7 +215,8 @@ function SignupPage() {
                 Graduation year
               </label>
 
-              <select className="w-full border rounded-lg px-4 py-3 outline-none">
+              <select className="w-full border rounded-lg px-4 py-3 outline-none"
+              onChange={(e)=> setGYear(e.target.value)}>
                 <option>Select year</option>
                 <option>2026</option>
                 <option>2027</option>
@@ -211,13 +236,14 @@ function SignupPage() {
               type="password"
               placeholder="Min 8 characters"
               className="w-full border rounded-lg px-4 py-3 outline-none"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
           <button className="w-full bg-[#534AB7] text-white rounded-lg py-3 font-medium hover:bg-[#4338a3] transition">
             Create account
           </button>
-
+          </form>
           <div className="flex items-center gap-3 my-5 text-sm text-gray-400">
             <div className="flex-1 h-px bg-gray-200"></div>
             or
