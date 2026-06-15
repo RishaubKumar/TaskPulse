@@ -3,32 +3,24 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/User.model')
 const app = express();
+const path = require("path");
 
-mongoose.connect("mongodb://127.0.0.1:27017/taskpulse")
+require("dotenv").config({
+    path: path.resolve(__dirname, "../.env"),
+});
+
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("Database connected"))
+    .catch(err => console.error(err));
+
 app.use(express.json());
 app.use(cors());
-app.post('/login', (req,res)=>{
-    const{email, password} = req.body;
-    User.findOne({email:email})
-    .then(user =>{
-        if(user){
-            if(user.password === password){
-                res.json("Success");
-            }else{
-                res.json("The password is incorrect.")
-            }
-        }else{
-            res.json("No such user found");
-        }
-    })
-})
+
 app.post('/register', async (req, res) => {
     try {
-        console.log(req.body);
-
+        // console.log(req.body);
         const newUser = await User.create(req.body);
-
-        console.log("Saved:", newUser);
+        // console.log("saved:", newUser);
 
         res.json(newUser);
     } catch (err) {
@@ -36,7 +28,19 @@ app.post('/register', async (req, res) => {
         res.status(500).json(err);
     }
 });
+app.post("/login", async (req, res) => {
+    try { const { email, password } = req.body; 
+    const user = await User.findOne({ email }); 
+    if (!user) {
+         return res.json("No such user found"); 
+    } if (user.password === password) { 
+        return res.json("Success"); 
+
+    } else { return res.json("Incorrect Password"); } } 
+    catch (err) { console.log(err);
+         res.json("Something went wrong"); }
+});
 const port = process.env.PORT || 5000;
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`Server is running at port ${port}`);
 })

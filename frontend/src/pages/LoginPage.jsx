@@ -6,16 +6,23 @@ import axios from 'axios';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
 
   const handleSubmit = (e) =>{
     e.preventDefault()
-    axios.post('http://localhost:5000/login',{email,password})
-    .then(result => {console.log(result)
-      navigate("/dash")
-  })
-    .catch(err => console.log(err))
+axios.post("http://localhost:5000/login", {
+    email,
+    password
+})
+.then(res => {
+    if (res.data === "Success") {
+        navigate("/dash");
+    } else {
+        alert(res.data);
+    }
+})
+.catch(err => console.log(err));
   }
 
     return (

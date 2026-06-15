@@ -5,4 +5,4 @@ const userAuth = require('./controllers/auth.controller');
 const app = express();
 
 app.get('/login',userAuth.login );
-app.post('/signUp',userAuth.signUp );
+app.post('/signUp',userAuth.register );
