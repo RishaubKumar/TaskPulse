@@ -2,16 +2,22 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const User = require('./models/User.model');
+const { generateRoadmapData } = require('./ai/roadmapGenerator');
 
 const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
 const { HumanMessage, SystemMessage } = require("@langchain/core/messages");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
+
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("Database connected"))
+    .catch(err => console.error(err));
 
 const fs = require('fs');
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
@@ -21,16 +27,81 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes defined before static files
-
-// AI Configuration
 const model = new ChatGoogleGenerativeAI({
-  model: "gemini-pro",
-  maxOutputTokens: 2048,
+  model: "gemini-2.5-flash",
+  maxOutputTokens: 8192,
   apiKey: process.env.GOOGLE_API_KEY,
 });
 
-// Routes
+app.post('/api/register', async (req, res) => {
+  try {
+    const newUser = await User.create(req.body);
+    res.json(newUser);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body; 
+    const user = await User.findOne({ email }); 
+    if (!user) {
+      return res.json("No such user found"); 
+    }
+    if (user.password === password) { 
+      return res.json({ message: "Success", user }); 
+    } else {
+      return res.json("Incorrect Password");
+    }
+  } catch (err) {
+    console.log(err);
+    res.json("Something went wrong");
+  }
+});
+
+app.post('/api/generate-roadmap', async (req, res) => {
+  try {
+    const { branch, goal, level, companies, currentYear, userId } = req.body;
+    const roadmap = await generateRoadmapData({ branch, goal, level, companies, currentYear });
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      await User.findByIdAndUpdate(userId, { roadmap });
+    }
+    res.json({ roadmap });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate roadmap" });
+  }
+});
+
+app.put('/api/user/roadmap', async (req, res) => {
+  try {
+    const { userId, roadmap } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(userId, { roadmap }, { new: true });
+    res.json({ message: "Success", user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update roadmap" });
+  }
+});
+
+app.put('/api/user/profile', async (req, res) => {
+  try {
+    const { userId, firstName, lastName, collegeName, branch, currentYear, gYear } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { firstName, lastName, collegeName, branch, currentYear, gYear },
+      { new: true }
+    );
+    res.json({ message: "Success", user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
+
 app.get("/", (req, res) => {
   res.send("TaskPulse Backend is running. Access the frontend at http://localhost:5173");
 });

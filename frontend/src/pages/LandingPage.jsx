@@ -5,6 +5,33 @@ import Navbar from "../components/layout/Navbar";
 import { Link } from "react-router-dom";
 
 function LandingPage(){
+  const user = localStorage.getItem("user");
+
+  let heroButton;
+  if (user) {
+    heroButton = (
+      <Link to="/dashboard" className="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-md shadow-md">
+        Go to Dashboard
+      </Link>
+    );
+  } else {
+    heroButton = (
+      <Link to="/signup" className="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-md shadow-md">
+        Build my roadmap (free)
+      </Link>
+    );
+  }
+
+  let bottomButton;
+  if (user) {
+    bottomButton = (
+      <Link to="/dashboard" className="btn text-white bg-blue-600 border border-blue-600 hover:bg-blue-700 hover:border-blue-700 rounded-md font-bold px-4 py-2 mt-3 inline-block">Go to Dashboard</Link>
+    );
+  } else {
+    bottomButton = (
+      <Link to="/signup" className="btn text-white bg-blue-600 border border-blue-600 hover:bg-blue-700 hover:border-blue-700 rounded-md font-bold px-4 py-2 mt-3 inline-block">Create my account</Link>
+    );
+  }
 
   return (
     <>
@@ -24,16 +51,14 @@ function LandingPage(){
 
       <p className="text-gray-700 text-lg max-w-2xl mx-auto mb-12 px-4">
         Most students reach final year with no portfolio, no internship, no clarity. 
-        TaskPulse gives you a personalized roadmap from Day 1 — built by AI, 
+        TaskPulse gives you a personalized roadmap from Day 1: built by AI, 
         shaped by your goals.
       </p>
 
       <div className="flex justify-center gap-5">
-        <Link to="/signup" className=" btn bg-black hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg text-md shadow-md">
-          Build my roadmap — free
-        </Link>
+        {heroButton}
         
-        <button className="bg-white hover:bg-gray-100 text-black font-bold py-3 px-6 rounded-lg border border-gray-400 text-md shadow-sm">
+        <button className="bg-white hover:bg-blue-50 text-blue-600 font-bold py-3 px-6 rounded-lg border border-blue-200 text-md shadow-sm cursor-pointer">
           See a demo
         </button>
       </div>
@@ -53,11 +78,11 @@ function LandingPage(){
       <p id="how-it-works"  className="text-gray-700 text-lg max-w-2xl mx-auto m-5 px-4">How it works</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-50 mt-5">
         <LandingpageBLcard 
-        icon = "1"
+         icon = "1"
         uppertext="Tell us your goals" 
         lowertext="Answer 5 questions about your branch, dream outcome, and skill level."/>
         <LandingpageBLcard 
-        icon = "2"
+         icon = "2"
         uppertext="Get your roadmap" 
         lowertext="AI generates a semester-by-semester plan with milestones tailored to you."/>
         <LandingpageBLcard 
@@ -69,10 +94,10 @@ function LandingPage(){
         uppertext="Graduate ready" 
         lowertext="Your vault becomes a portfolio. AI writes your career narrative automatically."/>
       </div>
-      <div className="border border-blue-400 bg-blue-200 p-5 mx-50 mt-10 mb-10 rounded-lg">
-        <h2 className="text-black text-2xl m-5">Start your roadmap today</h2>
-        <p className="mb-2">Free for students. No credit card. No fluff.</p>
-        <Link to="/signup" className=" btn text-black border border-black rounded-md font-bold p-2 mt-3">Create my account</Link>
+      <div className="border border-blue-100 bg-blue-50/50 p-8 mx-50 mt-10 mb-10 rounded-lg">
+        <h2 className="text-slate-900 text-2xl font-bold mb-3">Start your roadmap today</h2>
+        <p className="mb-4 text-slate-600">Free for students. No credit card. No fluff.</p>
+        {bottomButton}
       </div>
     </div>
     <hr className="border-t border-gray-300"/>

@@ -2,9 +2,8 @@ import { useState } from "react";
 import ProgressCard from "./ProgressCard";
 import CommentCard from "./CommentCard";
 
-function StepOne() {
-
-  const [selected, setSelected] = useState("");
+function StepOne({ formData, updateFormData }) {
+  const selected = formData.branch;
 
   return (
     <>
@@ -25,7 +24,7 @@ function StepOne() {
             uppertext="Computer Science / IT"
             lowertext="Software development and coding"
             selected={selected === "cs"}
-            onClick={() => setSelected("cs")}
+            onClick={() => updateFormData("branch", "cs")}
           />
 
           <ProgressCard
@@ -33,7 +32,7 @@ function StepOne() {
             uppertext="Electronics / ECE"
             lowertext="Hardware, circuits and embedded systems"
             selected={selected === "ece"}
-            onClick={() => setSelected("ece")}
+            onClick={() => updateFormData("branch", "ece")}
           />
 
           <ProgressCard
@@ -41,7 +40,7 @@ function StepOne() {
             uppertext="Mechanical / Civil"
             lowertext="Machines, structures and manufacturing"
             selected={selected === "mech"}
-            onClick={() => setSelected("mech")}
+            onClick={() => updateFormData("branch", "mech")}
           />
 
           <ProgressCard
@@ -49,7 +48,7 @@ function StepOne() {
             uppertext="Commerce / BBA / MBA"
             lowertext="Business, finance and management"
             selected={selected === "commerce"}
-            onClick={() => setSelected("commerce")}
+            onClick={() => updateFormData("branch", "commerce")}
           />
 
         </div>

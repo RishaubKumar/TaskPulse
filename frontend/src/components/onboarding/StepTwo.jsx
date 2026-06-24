@@ -2,14 +2,13 @@ import { useState } from "react";
 import ProgressCard from "./ProgressCard";
 import CommentCard from "./CommentCard";
 
-function StepTwo() {
-
-  const [selected, setSelected] = useState("");
+function StepTwo({ formData, updateFormData }) {
+  const selected = formData.goal;
 
   return (
     <>
       <div className="m-5">
-        <CommentCard comment="Great! Now the big question — what does success look like for you after graduation? Be honest, there are no wrong answers." />
+        <CommentCard comment="Great! Now the big question: what does success look like for you after graduation? Be honest, there are no wrong answers." />
         <h1 className="inline text-left text-black font-bold text-3xl">
           What's your primary goal?
         </h1>
@@ -25,7 +24,7 @@ function StepTwo() {
             uppertext="Product-based job"
             lowertext="FAANG, unicorns, top tech companies"
             selected={selected === "Product"}
-            onClick={() => setSelected("Product")}
+            onClick={() => updateFormData("goal", "Product")}
           />
 
           <ProgressCard
@@ -33,7 +32,7 @@ function StepTwo() {
             uppertext="Start a startup"
             lowertext="Build something from scratch"
             selected={selected === "startup"}
-            onClick={() => setSelected("startup")}
+            onClick={() => updateFormData("goal", "startup")}
           />
 
           <ProgressCard
@@ -41,7 +40,7 @@ function StepTwo() {
             uppertext="Higher studies / MS"
             lowertext="GATE, GRE, research abroad"
             selected={selected === "abroad"}
-            onClick={() => setSelected("abroad")}
+            onClick={() => updateFormData("goal", "abroad")}
           />
 
           <ProgressCard
@@ -49,7 +48,7 @@ function StepTwo() {
             uppertext="Government / PSU"
             lowertext="UPSC, SSC, banking exams"
             selected={selected === "gov"}
-            onClick={() => setSelected("gov")}
+            onClick={() => updateFormData("goal", "gov")}
           />
 
         </div>

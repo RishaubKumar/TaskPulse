@@ -10,17 +10,24 @@ const userSchema = new mongoose.Schema({
     email:{
         type: String,
     },
-    CollegeName:{
+    collegeName:{
         type: String,
     },
-    Branch:{
+    branch:{
+        type: String,
+    },
+    currentYear:{
+        type: String,
+    },
+    gYear:{
         type: String,
     },
     password:{
         type: String,
     },
-    
-
+    roadmap:{
+        type: Array,
+    },
 })
 
 module.exports = mongoose.model('user' , userSchema);

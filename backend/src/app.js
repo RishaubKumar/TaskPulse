@@ -29,16 +29,21 @@ app.post('/register', async (req, res) => {
     }
 });
 app.post("/login", async (req, res) => {
-    try { const { email, password } = req.body; 
-    const user = await User.findOne({ email }); 
-    if (!user) {
-         return res.json("No such user found"); 
-    } if (user.password === password) { 
-        return res.json("Success"); 
-
-    } else { return res.json("Incorrect Password"); } } 
-    catch (err) { console.log(err);
-         res.json("Something went wrong"); }
+    try {
+        const { email, password } = req.body; 
+        const user = await User.findOne({ email }); 
+        if (!user) {
+            return res.json("No such user found"); 
+        }
+        if (user.password === password) { 
+            return res.json({ message: "Success", user }); 
+        } else {
+            return res.json("Incorrect Password");
+        }
+    } catch (err) {
+        console.log(err);
+        res.json("Something went wrong");
+    }
 });
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
@@ -6,9 +7,35 @@ import StepFour from "./StepFour";
 import StepFive from "./StepFive";
 
 function ProgressBar() {
-  const components = [<StepOne/>,<StepTwo/>,<StepThree/>,<StepFour/>,<StepFive/>];
+  const [formData, setFormData] = useState({
+    branch: "",
+    goal: "",
+    level: "",
+    companies: [],
+    currentYear: "Year 2"
+  });
+
+  const updateFormData = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const navigate = useNavigate();
   const [index, setIndex] = useState(0); 
-  const progress = (index +1)*20;
+
+  const components = [
+    <StepOne formData={formData} updateFormData={updateFormData} />,
+    <StepTwo formData={formData} updateFormData={updateFormData} />,
+    <StepThree formData={formData} updateFormData={updateFormData} />,
+    <StepFour formData={formData} updateFormData={updateFormData} />,
+    <StepFive formData={formData} />
+  ];
+
+  const progress = (index + 1) * 20;
+  let nextButtonText = "Next";
+  if (index === components.length - 1) {
+    nextButtonText = "Finish";
+  }
+
   return (
     <div className="p-5 " >
     <div className="flex pt-5 pb-3 space-x-280">
@@ -32,18 +59,22 @@ function ProgressBar() {
       <div className="flex space-x-250 p-3">
         <button
           onClick={() => setIndex(Math.max(index - 1, 0))}
-          className="px-4 py-2 bg-black text-white rounded-lg"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer"
         >
           Previous
         </button>
 
         <button
-          onClick={() =>
-            setIndex(Math.min(index + 1, components.length - 1))
-          }
-          className="px-4 py-2 bg-black text-white rounded-lg"
+          onClick={() => {
+            if (index === components.length - 1) {
+              navigate("/");
+            } else {
+              setIndex(index + 1);
+            }
+          }}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer"
         >
-          Next
+          {nextButtonText}
         </button>
       </div>
     </div>
