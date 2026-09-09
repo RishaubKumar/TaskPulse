@@ -54,11 +54,18 @@ function RegisterPage() {
         setError('Registration failed. Please try again.');
       }
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
-      } else {
-        setError('Unable to connect to server. Please try again.');
+      let message = 'Unable to connect to server. Please try again.';
+      if (err.response && err.response.data) {
+        const data = err.response.data;
+        if (typeof data.error === 'string') {
+          message = data.error;
+        } else if (data.error && typeof data.error.message === 'string') {
+          message = data.error.message;
+        } else if (typeof data.message === 'string') {
+          message = data.message;
+        }
       }
+      setError(message);
     } finally {
       setLoading(false);
     }

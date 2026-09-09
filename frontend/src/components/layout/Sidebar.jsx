@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 function Sidebar() {
@@ -32,9 +32,9 @@ function Sidebar() {
     <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col justify-between shrink-0 sticky top-0 font-sans">
       <div className="p-4 overflow-y-auto">
         <div className="px-2 py-3 mb-4">
-          <span className="text-2xl font-bold tracking-tight text-gray-900">
+          <Link to="/" className="inline-block text-2xl font-bold tracking-tight text-gray-900 hover:opacity-90 transition">
             task<span className="text-blue-600">pulse</span>
-          </span>
+          </Link>
         </div>
 
         <nav className="space-y-1">

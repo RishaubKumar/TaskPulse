@@ -12,10 +12,28 @@ const User = require('./models/User.model');
 const app = express();
 const port = process.env.PORT || 5000;
 
-connectDB();
+connectDB().catch((err) => {
+  console.error('Initial MongoDB connection error:', err.message);
+});
 
 app.use(cors());
 app.use(express.json());
+
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    try {
+      await connectDB();
+      next();
+    } catch (dbError) {
+      console.error('Database connection error in request:', dbError.message);
+      return res.status(500).json({
+        error: 'Database connection failed. Please verify MONGO_URI in your Vercel environment variables and ensure MongoDB Atlas IP Access List allows 0.0.0.0/0.'
+      });
+    }
+  } else {
+    next();
+  }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -50,8 +68,10 @@ app.use('/api', (req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
 });
 
-app.listen(port, () => {
-  console.log(`TaskPulse server running on port ${port}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`TaskPulse server running on port ${port}`);
+  });
+}
 
 module.exports = app;
