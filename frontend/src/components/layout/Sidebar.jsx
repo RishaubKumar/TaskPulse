@@ -1,150 +1,114 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 function Sidebar() {
-  const userJson = localStorage.getItem("user");
-  
-  let user = null;
-  if (userJson) {
-    user = JSON.parse(userJson);
-  }
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
-  let firstName = "Rahul";
-  if (user) {
-    firstName = user.firstName;
-  }
+  const firstName = user?.firstName || 'Student';
+  const lastName = user?.lastName || '';
+  const branch = user?.branch || 'CSE';
+  const collegeName = user?.collegeName || 'Engineering College';
+  const currentYear = user?.currentYear || 'Year 1';
 
-  let lastName = "Kumar";
-  if (user) {
-    lastName = user.lastName;
-  }
+  const fChar = firstName ? firstName[0] : 'S';
+  const lChar = lastName ? lastName[0] : '';
+  const initials = (fChar + lChar).toUpperCase();
 
-  let branch = "CSE";
-  if (user) {
-    branch = user.branch;
-  }
-
-  let collegeName = "VIT";
-  if (user) {
-    collegeName = user.collegeName;
-  }
-
-  let currentYear = "Year 2";
-  if (user) {
-    currentYear = user.currentYear;
-  }
-
-  let fChar = "";
-  if (firstName && firstName.length > 0) {
-    fChar = firstName[0];
-  }
-  let lChar = "";
-  if (lastName && lastName.length > 0) {
-    lChar = lastName[0];
-  }
-  let initials = (fChar + lChar).toUpperCase();
-  if (!initials) {
-    initials = "RK";
-  }
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const getLinkClass = (isActive) => {
-    const base = "flex items-center gap-3 rounded-xl p-4 mb-3 font-semibold transition-all ";
+    const base = 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ';
     if (isActive) {
-      return base + "bg-blue-50 text-blue-700";
-    } else {
-      return base + "text-slate-600 hover:bg-blue-50/50 hover:text-blue-600";
+      return base + 'bg-blue-100 text-blue-800 font-semibold';
     }
+    return base + 'text-gray-700 hover:bg-gray-100 hover:text-gray-900';
   };
 
   return (
-    <div className="w-72 bg-white text-slate-800 border-r border-blue-100 h-screen flex flex-col justify-between">
-      <div>
-        <div className="text-3xl font-bold p-8 text-slate-900">
-          task<span className="text-blue-600">pulse</span>
+    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col justify-between shrink-0 sticky top-0 font-sans">
+      <div className="p-4 overflow-y-auto">
+        <div className="px-2 py-3 mb-4">
+          <span className="text-2xl font-bold tracking-tight text-gray-900">
+            task<span className="text-blue-600">pulse</span>
+          </span>
         </div>
 
-        <div className="px-4">
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
+        <nav className="space-y-1">
+          <NavLink to="/dashboard" className={({ isActive }) => getLinkClass(isActive)}>
             Dashboard
           </NavLink>
 
-          <NavLink
-            to="/roadmap"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            My roadmap
+          <NavLink to="/roadmap" className={({ isActive }) => getLinkClass(isActive)}>
+            My Roadmap
           </NavLink>
 
-          <NavLink
-            to="/vault"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            Evidence vault
+          <NavLink to="/vault" className={({ isActive }) => getLinkClass(isActive)}>
+            Evidence Vault
           </NavLink>
 
-          <h2 className="text-slate-400 text-xs font-semibold mt-8 mb-3 px-4 tracking-wider">
-            PLACEMENT
-          </h2>
+          <div className="pt-4 pb-1">
+            <span className="text-xs font-semibold text-gray-400 tracking-wider uppercase px-3">
+              Placement Prep
+            </span>
+          </div>
 
-          <NavLink
-            to="/resume"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
+          <NavLink to="/resume" className={({ isActive }) => getLinkClass(isActive)}>
             Resume AI
           </NavLink>
 
-          <NavLink
-            to="/mock"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            Mock interview
+          <NavLink to="/mock" className={({ isActive }) => getLinkClass(isActive)}>
+            Mock Interview
           </NavLink>
 
-          <h2 className="text-slate-400 text-xs font-semibold mt-8 mb-3 px-4 tracking-wider">
-            TRACK
-          </h2>
+          <div className="pt-4 pb-1">
+            <span className="text-xs font-semibold text-gray-400 tracking-wider uppercase px-3">
+              Tracking
+            </span>
+          </div>
 
-          <NavLink
-            to="/progress"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            Progress
+          <NavLink to="/progress" className={({ isActive }) => getLinkClass(isActive)}>
+            Track Progress
           </NavLink>
 
-          <NavLink
-            to="/review"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            Weekly review
+          <NavLink to="/review" className={({ isActive }) => getLinkClass(isActive)}>
+            Weekly Review
           </NavLink>
 
-          <NavLink
-            to="/settings"
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
+          <NavLink to="/settings" className={({ isActive }) => getLinkClass(isActive)}>
             Settings
           </NavLink>
-        </div>
+        </nav>
       </div>
 
-      <div className="border-t border-blue-100 p-5 flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-          {initials}
-        </div>
-
-        <div>
-          <p className="font-semibold text-slate-800">
-            {firstName} {lastName}
-          </p>
-
-          <p className="text-slate-500 text-sm">
-            {currentYear} • {branch} • {collegeName}
-          </p>
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              {initials}
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-xs text-gray-800 truncate">
+                {firstName} {lastName}
+              </p>
+              <p className="text-gray-500 text-[11px] truncate">
+                {currentYear} • {branch} • {collegeName}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Logout"
+            className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 border border-gray-300 rounded bg-white hover:bg-red-50 transition cursor-pointer shrink-0"
+          >
+            Exit
+          </button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
 

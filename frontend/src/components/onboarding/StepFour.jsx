@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CommentCard from './CommentCard';
+
 function StepFour({ formData, updateFormData }) {
   const activeCompanies = formData.companies || [];
-  const selectedYear = formData.currentYear || "Year 2";
+  const selectedYear = formData.currentYear || 'Year 1';
+  const [customInput, setCustomInput] = useState('');
 
   const suggestedCompanies = [
-    'Google', 'Microsoft', 'Flipkart', 'Razorpay', 'Swiggy', 'Zepto', 'Amazon'
+    'Google', 'Microsoft', 'Flipkart', 'Razorpay', 'Swiggy', 'Amazon', 'Atlassian', 'Uber'
   ];
 
   const years = ['Year 1', 'Year 2', 'Year 3', 'Year 4'];
@@ -17,52 +19,88 @@ function StepFour({ formData, updateFormData }) {
     } else {
       nextCompanies = [...activeCompanies, company];
     }
-    updateFormData("companies", nextCompanies);
+    updateFormData('companies', nextCompanies);
+  };
+
+  const handleAddCustom = (e) => {
+    e.preventDefault();
+    const trimmed = customInput.trim();
+    if (trimmed && !activeCompanies.includes(trimmed)) {
+      updateFormData('companies', [...activeCompanies, trimmed]);
+      setCustomInput('');
+    }
   };
 
   return (
-    <div className=" mx-auto p-4  text-gray-800">
-        <CommentCard comment="Almost there! Two last things: which companies excite you, and which year are you in?"/>
+    <div>
+      <CommentCard comment="Almost there! Tell me which companies excite you and which year of college you are currently in." />
+
       <div className="mb-6">
-        <h1 className="inline text-left text-black font-bold text-3xl">Dream companies & your current year</h1>
-        <p className="text-gray-600 text-sm md:text-base">This helps me set the urgency and depth of your roadmap.</p>
+        <h2 className="text-2xl font-bold text-gray-900">Target Companies & Current Year</h2>
+        <p className="text-sm text-gray-600 mt-1">
+          This helps set the technical depth and timeline urgency for your milestones.
+        </p>
       </div>
-      <div className="mb-8">
-        <input type="text" placeholder="Type a company name, e.g. Google, Swiggy, Infosys..." className="w-full border border-gray-300 rounded-lg p-3 text-base outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-gray-400 transition-shadow"/>
-        <div className="flex flex-wrap gap-3 mt-4">
+
+      <div className="mb-6">
+        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+          Target / Dream Companies
+        </label>
+        
+        <form onSubmit={handleAddCustom} className="flex gap-2 mb-3">
+          <input
+            type="text"
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            placeholder="Type a company name and press Add (e.g. Cisco, Oracle)..."
+            className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold rounded border border-gray-300 transition cursor-pointer"
+          >
+            Add
+          </button>
+        </form>
+
+        <div className="flex flex-wrap gap-2">
           {suggestedCompanies.map((company) => {
-            const isActive = activeCompanies.includes(company);
-            let btnClass = 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50';
-            if (isActive) {
-              btnClass = 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
-            }
+            const isSelected = activeCompanies.includes(company);
             return (
               <button
+                type="button"
                 key={company}
                 onClick={() => toggleCompany(company)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${btnClass}`}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                  isSelected
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
               >
-                {company}
+                {company} {isSelected ? '✓' : '+'}
               </button>
             );
           })}
         </div>
       </div>
+
       <div>
-        <h3 className="text-lg font-medium text-gray-700 mb-4">Which year are you in?</h3>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+          Current Academic Year
+        </label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {years.map((year) => {
             const isSelected = selectedYear === year;
-            let yearClass = 'bg-white border-gray-300 text-gray-800 hover:border-gray-400';
-            if (isSelected) {
-              yearClass = 'bg-blue-600 border-blue-600 text-white shadow-sm';
-            }
             return (
               <button
+                type="button"
                 key={year}
-                onClick={() => updateFormData("currentYear", year)}
-                className={`py-3 px-4 rounded-xl font-medium border transition-all ${yearClass}`}
+                onClick={() => updateFormData('currentYear', year)}
+                className={`py-2.5 px-4 rounded-lg font-semibold text-sm border transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
               >
                 {year}
               </button>
@@ -70,7 +108,6 @@ function StepFour({ formData, updateFormData }) {
           })}
         </div>
       </div>
-
     </div>
   );
 }

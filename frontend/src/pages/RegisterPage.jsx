@@ -1,279 +1,225 @@
-import {Link , useNavigate} from "react-router-dom"
-import axios from'axios'
-import {useState} from 'react' 
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../hooks/useAuth';
 
-function SignupPage() {
-  const [firstName,setFirstName] = useState()
-  const [lastName,setLastName] = useState()
-  const [email,setEmail] = useState()
-  const [collegeName,setCollegeName] = useState()
-  const [branch,setBranch] = useState()
-  const [currentYear,setcurrentYear] = useState()
-  const [gYear,setGYear] = useState()
-  const [password,setPassword] = useState()
-
+function RegisterPage() {
   const navigate = useNavigate();
-  const handleSubmit = (e) =>{
-    e.preventDefault()
-    axios.post('/api/register',{firstName, lastName, email, collegeName, branch,currentYear,gYear,password})
-    .then(result => {
-      console.log(result)
-      localStorage.setItem("user", JSON.stringify(result.data))
-      navigate("/onboarding")
-    })
-    .catch(err => console.log(err))
-  }
+  const { login } = useAuth();
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [collegeName, setCollegeName] = useState('');
+  const [branch, setBranch] = useState('Computer science / IT');
+  const [currentYear, setCurrentYear] = useState('Year 1');
+  const [gYear, setGYear] = useState('2028');
+  const [password, setPassword] = useState('');
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!firstName || !email || !password) {
+      setError('First name, email, and password are required.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await axios.post('/api/auth/register', {
+        firstName,
+        lastName,
+        email,
+        collegeName,
+        branch,
+        currentYear,
+        gYear,
+        password
+      });
+
+      if (res.data && res.data.token) {
+        login(res.data.user, res.data.token);
+        navigate('/onboarding');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Unable to connect to server. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-
-        <div className="bg-blue-600  p-10 flex flex-col text-white">
-
-          <div className="text-xl font-semibold mb-8">
-            task<span className="text-white">pulse</span>
-          </div>
-
-          <div className="flex-1">
-            <p className="text-sm text-white mb-6">
-              What happens after you register
-            </p>
-
-            <div className="space-y-6">
-
-              <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold">
-                  1
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">
-                    Create your account
-                  </h4>
-                  <p className="text-xs text-white">
-                    30 seconds. Free forever, no credit card.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-sm">
-                  2
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">
-                    AI onboarding: 5 questions
-                  </h4>
-                  <p className="text-xs text-white">
-                    Tell us your goal, branch, and skill level.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-white/20 text-black flex items-center justify-center text-sm">
-                  3
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">
-                    Get your 4-year roadmap
-                  </h4>
-                  <p className="text-xs text-[#AFA9EC]">
-                    AI builds your personalised semester plan instantly.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-white/20 text-[#AFA9EC] flex items-center justify-center text-sm">
-                  4
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">
-                    Check in every week
-                  </h4>
-                  <p className="text-xs text-[#AFA9EC]">
-                    AI keeps you on track. Your story builds itself.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-5 mt-8 space-y-3 text-sm text-[#AFA9EC]">
-            <div>Your data is private and never sold</div>
-            <div>Mobile app coming soon (same account)</div>
-            <div>Free for all college students</div>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
+      <div className="max-w-xl w-full bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
+        <div className="mb-6 text-center">
+          <Link to="/" className="text-2xl font-bold tracking-tight text-gray-900">
+            task<span className="text-blue-600">pulse</span>
+          </Link>
+          <h1 className="text-xl font-bold text-gray-800 mt-4">Create Your Student Account</h1>
+          <p className="text-sm text-gray-600 mt-1">Set up your profile to build your 4-year college roadmap</p>
         </div>
 
-        <div className="p-8 overflow-y-auto bg-white">
-          <div className="flex border rounded-lg overflow-hidden w-fit mb-6">
-            <Link to="/signup" className="  btn px-5 py-2 bg-blue-600 text-white text-sm" >
-              Register
-            </Link>
-
-            <Link to="/login" className=" btn px-5 py-2 text-slate-500  text-sm">
-              Log in
-            </Link>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded">
+            {error}
           </div>
-          <h1 className="text-2xl font-semibold mb-1">
-            Create your account
-          </h1>
+        )}
 
-          <p className="text-sm text-gray-500 mb-6">
-            Join and get your 4-year roadmap in under 5 minutes.
-          </p>
-          <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium uppercase mb-2">
-                First name
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                First Name *
               </label>
-
               <input
                 type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Rahul"
-                className="w-full border rounded-lg px-4 py-3 outline-none"
-                onChange={(e)=>setFirstName(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
+                required
               />
             </div>
-
             <div>
-              <label className="block text-xs font-medium uppercase mb-2">
-                Last name
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Last Name
               </label>
-
               <input
                 type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 placeholder="Kumar"
-                className="w-full border rounded-lg px-4 py-3 outline-none"
-                onChange={(e)=>setLastName(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
               />
             </div>
-
           </div>
-          <div className="mb-4">
-            <label className="block text-xs font-medium uppercase mb-2">
-              Email address
-            </label>
 
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              College / University Email *
+            </label>
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="rahul@college.edu.in"
-              className="w-full border rounded-lg px-4 py-3 outline-none"
-              onChange={(e)=>setEmail(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
+              required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              College / University Name
+            </label>
+            <input
+              type="text"
+              value={collegeName}
+              onChange={(e) => setCollegeName(e.target.value)}
+              placeholder="VIT / NIT / College name"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-medium uppercase mb-2">
-                College / university
-              </label>
-
-              <input
-                type="text"
-                placeholder="VIT Vellore"
-                className="w-full border rounded-lg px-4 py-3 outline-none"
-                onChange={(e)=> setCollegeName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium uppercase mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Branch
               </label>
-
-              <select className="w-full border rounded-lg px-4 py-3 outline-none" 
-              onChange={(e)=> setBranch(e.target.value)}>
-                <option>Select branch</option>
-                <option>Computer science / IT</option>
-                <option>Electronics / ECE</option>
-                <option>Mechanical / Civil</option>
-                <option>Commerce / BBA / MBA</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
-            <div>
-              <label className="block text-xs font-medium uppercase mb-2">
-                Current year
-              </label>
-
-              <select className="w-full border rounded-lg px-4 py-3 outline-none"
-              onChange={(e)=> setcurrentYear(e.target.value)}>
-                <option>Select year</option>
-                <option>Year 1</option>
-                <option>Year 2</option>
-                <option>Year 3</option>
-                <option>Year 4</option>
+              <select
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm outline-none bg-white focus:border-blue-600"
+              >
+                <option value="Computer science / IT">Computer science / IT</option>
+                <option value="Electronics / ECE">Electronics / ECE</option>
+                <option value="Mechanical / Civil">Mechanical / Civil</option>
+                <option value="Commerce / BBA / MBA">Commerce / BBA / MBA</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-medium uppercase mb-2">
-                Graduation year
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Current Year
               </label>
-
-              <select className="w-full border rounded-lg px-4 py-3 outline-none"
-              onChange={(e)=> setGYear(e.target.value)}>
-                <option>Select year</option>
-                <option>2026</option>
-                <option>2027</option>
-                <option>2028</option>
-                <option>2029</option>
+              <select
+                value={currentYear}
+                onChange={(e) => setCurrentYear(e.target.value)}
+                className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm outline-none bg-white focus:border-blue-600"
+              >
+                <option value="Year 1">Year 1</option>
+                <option value="Year 2">Year 2</option>
+                <option value="Year 3">Year 3</option>
+                <option value="Year 4">Year 4</option>
               </select>
             </div>
 
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Graduation Year
+              </label>
+              <select
+                value={gYear}
+                onChange={(e) => setGYear(e.target.value)}
+                className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm outline-none bg-white focus:border-blue-600"
+              >
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+              </select>
+            </div>
           </div>
 
-          <div className="mb-5">
-            <label className="block text-xs font-medium uppercase mb-2">
-              Password
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Password (min 6 characters) *
             </label>
-
             <input
               type="password"
-              placeholder="Min 8 characters"
-              className="w-full border rounded-lg px-4 py-3 outline-none"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a password"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-600"
+              required
             />
           </div>
 
-          <button className="w-full bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 transition">
-            Create account
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded text-sm transition disabled:opacity-60 cursor-pointer"
+          >
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
-          </form>
-          <div className="flex items-center gap-3 my-5 text-sm text-gray-400">
-            <div className="flex-1 h-px bg-gray-200"></div>
-            or
-            <div className="flex-1 h-px bg-gray-200"></div>
-          </div>
+        </form>
 
-          <button className="w-full border rounded-lg py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition">
-            Continue with Google
-          </button>
-
-          <div className="text-center text-sm text-gray-500 mt-5">
-            Already have an account?
-            <span className="text-blue-600 font-medium cursor-pointer ml-1">
-              Log in
-            </span>
-          </div>
-
-          {/* <div className="text-center text-xs text-gray-400 mt-4 leading-6">
-            By registering you agree to our Terms of service and Privacy policy
-          </div> */}
-
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-600">
+          Already registered?{' '}
+          <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+            Log in here
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
-export default SignupPage;
+export default RegisterPage;

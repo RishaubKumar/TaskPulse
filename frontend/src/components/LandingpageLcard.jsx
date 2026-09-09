@@ -1,10 +1,10 @@
-function LandingpageLcard({icon,uppertext,lowertext}){
-    return(
-        <div className="border border-white rounded-lg shadow-sm bg-white p-5 ">
-            <div>{icon}</div>
-            <h3 className="text-left text-black font-bold">{uppertext}</h3>
-            <p className="text-left">{lowertext}</p>
-        </div>
-    );
+function LandingpageLcard({ uppertext, lowertext }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm text-left">
+      <h3 className="text-base font-bold text-gray-900 mb-1">{uppertext}</h3>
+      <p className="text-sm text-gray-600 leading-relaxed">{lowertext}</p>
+    </div>
+  );
 }
+
 export default LandingpageLcard;

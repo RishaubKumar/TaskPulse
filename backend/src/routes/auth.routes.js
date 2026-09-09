@@ -1,8 +1,10 @@
 const express = require('express');
-// const mongoose = require('mongoose');
-// const bodyParser = require('body-parser');
-const userAuth = require('./controllers/auth.controller');
-const app = express();
+const router = express.Router();
+const { register, login, getMe } = require('../controllers/auth.controller');
+const { verifyToken } = require('../middleware/auth.middleware');
 
-app.get('/login',userAuth.login );
-app.post('/signUp',userAuth.register );
+router.post('/register', register);
+router.post('/login', login);
+router.get('/me', verifyToken, getMe);
+
+module.exports = router;

@@ -1,20 +1,13 @@
-import { useState } from "react";
-import Sidebar from "../components/layout/Sidebar";
+import Sidebar from '../components/layout/Sidebar';
+import { useAuth } from '../hooks/useAuth';
 
 function ProgressPage() {
-  const userJson = localStorage.getItem("user");
-  
-  let user = null;
-  if (userJson) {
-    user = JSON.parse(userJson);
-  }
-
+  const { user } = useAuth();
   const roadmap = user?.roadmap || [];
 
-  // Calculate statistics
   let totalMilestones = 0;
   let completedMilestones = 0;
-  
+
   const semesterStats = [];
   const categoryStats = {
     technical: { completed: 0, total: 0 },
@@ -22,26 +15,26 @@ function ProgressPage() {
     placement: { completed: 0, total: 0 }
   };
 
-  roadmap.forEach(sem => {
+  roadmap.forEach((sem) => {
     let semTotal = 0;
     let semCompleted = 0;
 
     if (sem.milestones) {
-      sem.milestones.forEach(m => {
+      sem.milestones.forEach((m) => {
         totalMilestones++;
         semTotal++;
-        
-        const isDone = m.status === "done";
+
+        const isDone = m.status === 'done';
         if (isDone) {
           completedMilestones++;
           semCompleted++;
         }
 
         const cat = m.category.toLowerCase();
-        if (cat.includes("technical")) {
+        if (cat.includes('technical')) {
           categoryStats.technical.total++;
           if (isDone) categoryStats.technical.completed++;
-        } else if (cat.includes("portfolio")) {
+        } else if (cat.includes('portfolio')) {
           categoryStats.portfolio.total++;
           if (isDone) categoryStats.portfolio.completed++;
         } else {
@@ -51,114 +44,116 @@ function ProgressPage() {
       });
     }
 
-    let percentage = 0;
-    if (semTotal > 0) {
-      percentage = Math.round((semCompleted / semTotal) * 100);
-    }
-
+    const percentage = semTotal > 0 ? Math.round((semCompleted / semTotal) * 100) : 0;
     semesterStats.push({
       semester: sem.semester,
       completed: semCompleted,
       total: semTotal,
-      percentage: percentage
+      percentage
     });
   });
 
-  let overallProgress = 0;
-  if (totalMilestones > 0) {
-    overallProgress = Math.round((completedMilestones / totalMilestones) * 100);
-  }
+  const overallProgress = totalMilestones > 0
+    ? Math.round((completedMilestones / totalMilestones) * 100)
+    : 0;
 
   const getCategoryPercent = (cat) => {
     const stats = categoryStats[cat];
-    let percent = 0;
-    if (stats.total > 0) {
-      percent = Math.round((stats.completed / stats.total) * 100);
-    }
-    return percent;
+    return stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
   };
 
   return (
-    <div className="flex bg-slate-50 min-h-screen font-sans">
+    <div className="flex bg-gray-50 min-h-screen font-sans">
       <Sidebar />
-      <div className="flex-1 p-6 overflow-y-auto max-h-screen">
-        <div className="mb-6 border-b border-gray-200 pb-4">
-          <h1 className="text-3xl font-bold text-gray-800">Track Progress</h1>
-          <p className="text-gray-600 mt-1 text-base">
-            Detailed stats of your milestone completions.
+
+      <main className="flex-1 p-6 overflow-y-auto max-h-screen">
+        <header className="mb-6 border-b border-gray-200 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Progress Tracker</h1>
+          <p className="text-xs text-gray-600 mt-1">
+            Visual metrics of your milestones across all 8 semesters and core placement areas.
           </p>
-        </div>
+        </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Overall Progress & Focus Areas */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Overall Card */}
-            <div className="bg-white border border-gray-300 rounded-lg p-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="bg-white border border-gray-300 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-sm">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">Overall Progress</h2>
-                <p className="text-gray-500 text-sm mt-1">
-                  You finished {completedMilestones} of {totalMilestones} milestones.
+                <h2 className="text-lg font-bold text-gray-900">Overall 4-Year Completion</h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  You have finished {completedMilestones} out of {totalMilestones} planned milestones.
                 </p>
-                <div className="mt-4 flex gap-4 text-xs font-bold text-gray-600">
-                  <div className="bg-gray-100 p-2.5 rounded border border-gray-200 text-center min-w-24">
+
+                <div className="mt-4 flex gap-4 text-xs font-semibold">
+                  <div className="bg-gray-50 p-2.5 rounded border border-gray-200 text-center min-w-24">
                     <span className="text-xl font-bold text-blue-600 block">{completedMilestones}</span>
-                    <span>Done</span>
+                    <span className="text-gray-600">Completed</span>
                   </div>
-                  <div className="bg-gray-100 p-2.5 rounded border border-gray-200 text-center min-w-24">
-                    <span className="text-xl font-bold text-gray-700 block">{totalMilestones - completedMilestones}</span>
-                    <span>Pending</span>
+                  <div className="bg-gray-50 p-2.5 rounded border border-gray-200 text-center min-w-24">
+                    <span className="text-xl font-bold text-gray-700 block">
+                      {totalMilestones - completedMilestones}
+                    </span>
+                    <span className="text-gray-600">Remaining</span>
                   </div>
                 </div>
               </div>
 
-              {/* Simplified Student-style progress display */}
-              <div className="text-center bg-blue-50 border border-blue-200 rounded-lg p-5 w-40">
-                <span className="text-5xl font-extrabold text-blue-600 block">{overallProgress}%</span>
-                <span className="text-xs font-bold text-blue-800 uppercase tracking-wider block mt-1">Completed</span>
-                <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+              <div className="text-center bg-blue-50 border border-blue-200 rounded-lg p-5 w-36 shrink-0">
+                <span className="text-4xl font-extrabold text-blue-600 block">{overallProgress}%</span>
+                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider block mt-1">
+                  Complete
+                </span>
+                <div className="w-full h-1.5 bg-gray-200 rounded-full mt-3 overflow-hidden">
                   <div className="h-full bg-blue-600" style={{ width: `${overallProgress}%` }}></div>
                 </div>
               </div>
             </div>
 
-            {/* Focus Areas Category Breakdown */}
-            <div className="bg-white border border-gray-300 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Focus Area Breakdown</h2>
+            <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm">
+              <h2 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                Category Distribution
+              </h2>
+
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-gray-700 text-xs font-semibold mb-1">
-                    <span>Technical Skills</span>
-                    <span>{categoryStats.technical.completed} / {categoryStats.technical.total} ({getCategoryPercent('technical')}%)</span>
+                  <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+                    <span>Technical Skills (Languages, DSA, Frameworks)</span>
+                    <span>
+                      {categoryStats.technical.completed} / {categoryStats.technical.total} ({getCategoryPercent('technical')}%)
+                    </span>
                   </div>
-                  <div className="w-full h-3 bg-gray-205 border rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-600"
+                      className="h-full bg-blue-600 transition-all"
                       style={{ width: `${getCategoryPercent('technical')}%` }}
                     ></div>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between text-gray-700 text-xs font-semibold mb-1">
-                    <span>Portfolio Building</span>
-                    <span>{categoryStats.portfolio.completed} / {categoryStats.portfolio.total} ({getCategoryPercent('portfolio')}%)</span>
+                  <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+                    <span>Portfolio Building (Projects, Live Demos, Open Source)</span>
+                    <span>
+                      {categoryStats.portfolio.completed} / {categoryStats.portfolio.total} ({getCategoryPercent('portfolio')}%)
+                    </span>
                   </div>
-                  <div className="w-full h-3 bg-gray-205 border rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-indigo-600"
+                      className="h-full bg-indigo-600 transition-all"
                       style={{ width: `${getCategoryPercent('portfolio')}%` }}
                     ></div>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between text-gray-700 text-xs font-semibold mb-1">
-                    <span>Placement Readiness</span>
-                    <span>{categoryStats.placement.completed} / {categoryStats.placement.total} ({getCategoryPercent('placement')}%)</span>
+                  <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+                    <span>Placement Readiness (Aptitude, Mock Interviews, Core CS)</span>
+                    <span>
+                      {categoryStats.placement.completed} / {categoryStats.placement.total} ({getCategoryPercent('placement')}%)
+                    </span>
                   </div>
-                  <div className="w-full h-3 bg-gray-205 border rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-purple-600"
+                      className="h-full bg-emerald-600 transition-all"
                       style={{ width: `${getCategoryPercent('placement')}%` }}
                     ></div>
                   </div>
@@ -167,20 +162,24 @@ function ProgressPage() {
             </div>
           </div>
 
-          {/* Right Column: Semester Progression */}
           <div>
-            <div className="bg-white border border-gray-300 rounded-lg p-5">
-              <h2 className="text-xl font-bold text-gray-800 mb-3">Semester Progress</h2>
+            <div className="bg-white border border-gray-300 rounded-lg p-5 shadow-sm">
+              <h2 className="text-base font-bold text-gray-900 mb-3 pb-2 border-b border-gray-100">
+                Semester Breakdown
+              </h2>
+
               <div className="space-y-3">
-                {semesterStats.map(sem => (
-                  <div key={sem.semester} className="flex flex-col gap-1">
-                    <div className="flex justify-between text-xs font-semibold text-gray-550">
+                {semesterStats.map((sem) => (
+                  <div key={sem.semester} className="space-y-1">
+                    <div className="flex justify-between text-xs font-medium text-gray-700">
                       <span>Semester {sem.semester}</span>
-                      <span>{sem.percentage}% ({sem.completed}/{sem.total})</span>
+                      <span className="font-semibold text-gray-900">
+                        {sem.percentage}% ({sem.completed}/{sem.total})
+                      </span>
                     </div>
-                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500"
+                        className="h-full bg-blue-500 transition-all"
                         style={{ width: `${sem.percentage}%` }}
                       ></div>
                     </div>
@@ -190,7 +189,7 @@ function ProgressPage() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

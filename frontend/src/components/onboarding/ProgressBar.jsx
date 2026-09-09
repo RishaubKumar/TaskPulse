@@ -1,81 +1,125 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import StepOne from "./StepOne";
-import StepTwo from "./StepTwo";
-import StepThree from "./StepThree";
-import StepFour from "./StepFour";
-import StepFive from "./StepFive";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import StepOne from './StepOne';
+import StepTwo from './StepTwo';
+import StepThree from './StepThree';
+import StepFour from './StepFour';
+import StepFive from './StepFive';
 
 function ProgressBar() {
+  const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+  const [validationError, setValidationError] = useState('');
+
   const [formData, setFormData] = useState({
-    branch: "",
-    goal: "",
-    level: "",
-    companies: [],
-    currentYear: "Year 2"
+    branch: 'cs',
+    goal: 'Product',
+    level: 'Intermediate',
+    companies: ['Google', 'Microsoft', 'Flipkart'],
+    currentYear: 'Year 1'
   });
 
   const updateFormData = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    setValidationError('');
   };
 
-  const navigate = useNavigate();
-  const [index, setIndex] = useState(0); 
+  const totalSteps = 5;
 
-  const components = [
-    <StepOne formData={formData} updateFormData={updateFormData} />,
-    <StepTwo formData={formData} updateFormData={updateFormData} />,
-    <StepThree formData={formData} updateFormData={updateFormData} />,
-    <StepFour formData={formData} updateFormData={updateFormData} />,
-    <StepFive formData={formData} />
-  ];
+  const handleNext = () => {
+    setValidationError('');
 
-  const progress = (index + 1) * 20;
-  let nextButtonText = "Next";
-  if (index === components.length - 1) {
-    nextButtonText = "Finish";
-  }
+    if (index === 0 && !formData.branch) {
+      setValidationError('Please choose your academic branch to continue.');
+      return;
+    }
+    if (index === 1 && !formData.goal) {
+      setValidationError('Please select your primary career goal to continue.');
+      return;
+    }
+    if (index === 2 && !formData.level) {
+      setValidationError('Please pick your current programming level.');
+      return;
+    }
+
+    if (index === totalSteps - 1) {
+      navigate('/dashboard');
+    } else {
+      setIndex(index + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    setValidationError('');
+    setIndex(Math.max(index - 1, 0));
+  };
+
+  const progressPercent = ((index + 1) / totalSteps) * 100;
+
+  const renderActiveStep = () => {
+    switch (index) {
+      case 0:
+        return <StepOne formData={formData} updateFormData={updateFormData} />;
+      case 1:
+        return <StepTwo formData={formData} updateFormData={updateFormData} />;
+      case 2:
+        return <StepThree formData={formData} updateFormData={updateFormData} />;
+      case 3:
+        return <StepFour formData={formData} updateFormData={updateFormData} />;
+      case 4:
+        return <StepFive formData={formData} onComplete={() => navigate('/dashboard')} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="p-5 " >
-    <div className="flex pt-5 pb-3 space-x-280">
-    <div className="text-xl font-bold tracking-tight text-gray-900 select-none">
-        task<span className="text-blue-800">pulse</span>
-      </div>
-    <div>Step {index+1} of 5</div>
-    </div>
-
-      <div className=" h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
-
-      {/* <p className="text-lg font-semibold">{progress}%</p> */}
-        <div className="mb-5 ">
-            {components[index]}
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-between p-4 sm:p-8 font-sans">
+      <div className="max-w-2xl w-full mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
+            task<span className="text-blue-600">pulse</span>
+          </Link>
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Step {index + 1} of {totalSteps}
+          </span>
         </div>
-      <div className="flex space-x-250 p-3">
-        <button
-          onClick={() => setIndex(Math.max(index - 1, 0))}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer"
-        >
-          Previous
-        </button>
 
-        <button
-          onClick={() => {
-            if (index === components.length - 1) {
-              navigate("/");
-            } else {
-              setIndex(index + 1);
-            }
-          }}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer"
-        >
-          {nextButtonText}
-        </button>
+        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-6">
+          <div
+            className="h-full bg-blue-600 transition-all duration-300 rounded-full"
+            style={{ width: `${progressPercent}%` }}
+          ></div>
+        </div>
+
+        {validationError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded">
+            {validationError}
+          </div>
+        )}
+
+        <div className="mb-8">
+          {renderActiveStep()}
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={index === 0}
+            className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+          >
+            Previous
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition cursor-pointer shadow-sm"
+          >
+            {index === totalSteps - 1 ? 'Finish & Go to Dashboard' : 'Continue'}
+          </button>
+        </div>
       </div>
     </div>
   );

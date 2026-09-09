@@ -1,50 +1,41 @@
-import { useState } from "react";
-import axios from "axios";
-import Sidebar from "../components/layout/Sidebar";
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import Sidebar from '../components/layout/Sidebar';
+import { useAuth } from '../hooks/useAuth';
 
 function DashboardPage() {
-  const userJson = localStorage.getItem("user");
-  let initialUser = null;
-  if (userJson) {
-    initialUser = JSON.parse(userJson);
-  }
-  const [user, setUser] = useState(initialUser);
+  const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [deadlines, setDeadlines] = useState([]);
+  const [loadingDeadlines, setLoadingDeadlines] = useState(true);
+  const [isAddingDeadline, setIsAddingDeadline] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newTimeframe, setNewTimeframe] = useState('');
+  const [editingDeadlineId, setEditingDeadlineId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editTimeframe, setEditTimeframe] = useState('');
+  const [deadlineSubmitting, setDeadlineSubmitting] = useState(false);
 
-  let initialRoadmap = [];
-  if (user) {
-    if (user.roadmap) {
-      initialRoadmap = user.roadmap;
-    }
-  }
-  const [roadmap, setRoadmap] = useState(initialRoadmap);
+  const roadmap = user?.roadmap || [];
+  const firstName = user?.firstName || 'Student';
+  const currentYearStr = user?.currentYear || 'Year 1';
 
-  let firstName = "Rahul";
-  if (user) {
-    firstName = user.firstName;
-  }
-  let currentYearStr = "Year 2";
-  if (user) {
-    if (user.currentYear) {
-      currentYearStr = user.currentYear;
-    }
-  }
-  
-  let targetSemester = 3;
-  if (currentYearStr.includes("1")) targetSemester = 1;
-  else if (currentYearStr.includes("2")) targetSemester = 3;
-  else if (currentYearStr.includes("3")) targetSemester = 5;
-  else if (currentYearStr.includes("4")) targetSemester = 7;
+  let targetSemester = 1;
+  if (currentYearStr.includes('2')) targetSemester = 3;
+  else if (currentYearStr.includes('3')) targetSemester = 5;
+  else if (currentYearStr.includes('4')) targetSemester = 7;
 
   const toggleMilestone = (semNumber, milestoneIdx) => {
-    const updatedRoadmap = roadmap.map(sem => {
+    const updatedRoadmap = roadmap.map((sem) => {
       if (sem.semester === semNumber) {
         const updatedMilestones = sem.milestones.map((m, idx) => {
           if (idx === milestoneIdx) {
-            let nextStatus = "done";
-            if (m.status === "done") {
-              nextStatus = "pending";
-            }
-            return { ...m, status: nextStatus };
+            return {
+              ...m,
+              status: m.status === 'done' ? 'pending' : 'done'
+            };
           }
           return m;
         });
@@ -53,310 +44,503 @@ function DashboardPage() {
       return sem;
     });
 
-    setRoadmap(updatedRoadmap);
+    const updatedUser = { ...user, roadmap: updatedRoadmap };
+    updateUser(updatedUser);
 
-    if (user) {
-      const updatedUser = { ...user, roadmap: updatedRoadmap };
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      axios.put("/api/user/roadmap", {
-        userId: user._id,
-        roadmap: updatedRoadmap
-      })
-      .then(res => console.log("Roadmap updated"))
-      .catch(err => console.error(err));
-    }
+    axios.put('/api/user/roadmap', { roadmap: updatedRoadmap })
+      .catch((err) => console.error('Error updating milestone:', err));
   };
 
-  const currentSemData = roadmap.find(sem => sem.semester === targetSemester) || { milestones: [] };
+  const currentSemData = roadmap.find((sem) => sem.semester === targetSemester) || { milestones: [] };
   const currentMilestones = currentSemData.milestones || [];
 
   let totalMilestones = 0;
   let completedMilestones = 0;
-  roadmap.forEach(sem => {
+  roadmap.forEach((sem) => {
     if (sem.milestones) {
-      sem.milestones.forEach(m => {
+      sem.milestones.forEach((m) => {
         totalMilestones++;
-        if (m.status === "done") {
+        if (m.status === 'done') {
           completedMilestones++;
         }
       });
     }
   });
-  let percentComplete = 0;
-  if (totalMilestones > 0) {
-    percentComplete = Math.round((completedMilestones / totalMilestones) * 100);
-  }
+
+  const percentComplete = totalMilestones > 0
+    ? Math.round((completedMilestones / totalMilestones) * 100)
+    : 0;
 
   const getCategoryStats = (categoryName) => {
-    const categoryMilestones = currentMilestones.filter(m => m.category.toLowerCase().includes(categoryName.toLowerCase()) || categoryName.toLowerCase().includes(m.category.toLowerCase()));
-    const total = categoryMilestones.length;
-    const completed = categoryMilestones.filter(m => m.status === "done").length;
-    let percentage = 0;
-    if (total > 0) {
-      percentage = (completed / total) * 100;
-    }
+    const matched = currentMilestones.filter((m) =>
+      m.category.toLowerCase().includes(categoryName.toLowerCase())
+    );
+    const total = matched.length;
+    const completed = matched.filter((m) => m.status === 'done').length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { completed, total, percentage };
   };
 
-  let milestonesContent;
-  if (currentMilestones.length > 0) {
-    milestonesContent = currentMilestones.map((m, idx) => {
-      let taskClass = "text-slate-700";
-      if (m.status === "done") {
-        taskClass = "line-through text-slate-400";
-      }
+  const techStats = getCategoryStats('Technical');
+  const portfolioStats = getCategoryStats('Portfolio');
+  const placementStats = getCategoryStats('Placement');
 
-      let statusText = "Pending";
-      if (m.status === "done") {
-        statusText = "Completed";
-      }
+  useEffect(() => {
+    axios.get('/api/user/deadlines')
+      .then((res) => {
+        setDeadlines(res.data.deadlines || []);
+        setLoadingDeadlines(false);
+      })
+      .catch((err) => {
+        console.error('Error loading deadlines:', err);
+        setLoadingDeadlines(false);
+      });
+  }, []);
 
-      return (
-        <div key={idx} className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            checked={m.status === "done"}
-            onChange={() => toggleMilestone(targetSemester, idx)}
-            className="mt-1 h-5 w-5 rounded border-blue-200 text-blue-600 focus:ring-blue-500 cursor-pointer"
-          />
-          <div>
-            <h3 className={`font-semibold ${taskClass}`}>
-              {m.task}
-            </h3>
-            <p className="text-slate-400 text-sm mt-0.5">
-              {m.category} · {statusText}
-            </p>
-          </div>
-        </div>
-      );
-    });
-  } else {
-    milestonesContent = (
-      <div className="text-slate-400 text-sm">
-        No milestones generated yet. Complete the onboarding wizard to build your roadmap!
-      </div>
-    );
-  }
+  const handleAddDeadline = (e) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newTimeframe.trim() || deadlineSubmitting) return;
 
-  const techStats = getCategoryStats("Technical");
-  const portfolioStats = getCategoryStats("Portfolio");
-  const placementStats = getCategoryStats("Placement");
+    setDeadlineSubmitting(true);
+    axios.post('/api/user/deadlines', {
+      title: newTitle.trim(),
+      timeframe: newTimeframe.trim()
+    })
+      .then((res) => {
+        setDeadlines(res.data.deadlines || []);
+        setNewTitle('');
+        setNewTimeframe('');
+        setIsAddingDeadline(false);
+        setDeadlineSubmitting(false);
+      })
+      .catch((err) => {
+        console.error('Error adding deadline:', err);
+        setDeadlineSubmitting(false);
+      });
+  };
+
+  const handleStartEdit = (item) => {
+    setEditingDeadlineId(item._id);
+    setEditTitle(item.title);
+    setEditTimeframe(item.timeframe);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingDeadlineId(null);
+    setEditTitle('');
+    setEditTimeframe('');
+  };
+
+  const handleUpdateDeadline = (id, e) => {
+    e.preventDefault();
+    if (!editTitle.trim() || !editTimeframe.trim() || deadlineSubmitting) return;
+
+    setDeadlineSubmitting(true);
+    axios.put(`/api/user/deadlines/${id}`, {
+      title: editTitle.trim(),
+      timeframe: editTimeframe.trim()
+    })
+      .then((res) => {
+        setDeadlines(res.data.deadlines || []);
+        setEditingDeadlineId(null);
+        setEditTitle('');
+        setEditTimeframe('');
+        setDeadlineSubmitting(false);
+      })
+      .catch((err) => {
+        console.error('Error updating deadline:', err);
+        setDeadlineSubmitting(false);
+      });
+  };
+
+  const handleDeleteDeadline = (id) => {
+    if (!id || deadlineSubmitting) return;
+    setDeadlineSubmitting(true);
+    axios.delete(`/api/user/deadlines/${id}`)
+      .then((res) => {
+        setDeadlines(res.data.deadlines || []);
+        setDeadlineSubmitting(false);
+      })
+      .catch((err) => {
+        console.error('Error deleting deadline:', err);
+        setDeadlineSubmitting(false);
+      });
+  };
+
+  const getTimeframeBadgeClass = (timeframeStr) => {
+    const lower = (timeframeStr || '').toLowerCase();
+    if (lower.includes('day') || lower.includes('urgent') || lower.includes('tomorrow') || lower.includes('today')) {
+      return 'text-red-700 bg-red-50 border border-red-200 font-semibold';
+    }
+    if (lower.includes('week')) {
+      return 'text-amber-700 bg-amber-50 border border-amber-200 font-semibold';
+    }
+    return 'text-gray-700 bg-gray-100 border border-gray-200 font-medium';
+  };
 
   return (
-    <div className="flex bg-[#F8FAFC] min-h-screen">
-
+    <div className="flex bg-gray-50 min-h-screen font-sans">
       <Sidebar />
 
-      <div className="flex-1 p-8">
+      <main className="flex-1 p-6 overflow-y-auto max-h-screen">
+        <header className="mb-6 border-b border-gray-200 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Welcome, {firstName}
+            </h1>
+            <p className="text-xs text-gray-600 mt-1">
+              Enrolled in {user?.branch || 'Computer Science'} • {currentYearStr} • Target: Semester {targetSemester}
+            </p>
+          </div>
 
-        {/* Header */}
+          <div className="flex gap-2">
+            <Link
+              to="/roadmap"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded transition"
+            >
+              Open Full Roadmap
+            </Link>
+          </div>
+        </header>
 
-        <div>
-
-          <h1 className="text-5xl font-semibold text-slate-800">
-            Good morning, {firstName}
-          </h1>
-
-          <p className="text-slate-500 mt-2 text-xl">
-            You are on track: {currentMilestones.filter(m => m.status !== "done").length} milestones due this semester ·
-            Placement season in 18 months
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <p className="text-xs text-blue-900 leading-relaxed">
+            <span className="font-bold mr-1">Evidence Reminder:</span>
+            Add proof of your completed projects, certifications, or hackathons in the Evidence Vault to build your placement profile.
           </p>
-
+          <button
+            onClick={() => navigate('/vault')}
+            className="text-xs font-bold text-blue-700 hover:text-blue-900 underline shrink-0 cursor-pointer"
+          >
+            Go to Evidence Vault →
+          </button>
         </div>
 
-        {/* Alert */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <span className="text-xs text-gray-500 font-semibold uppercase">Overall Progress</span>
+            <div className="text-2xl font-bold text-blue-600 mt-1">{percentComplete}%</div>
+            <p className="text-[11px] text-gray-500 mt-0.5">{completedMilestones} of {totalMilestones} done</p>
+          </div>
 
-        <div className="mt-8 border border-blue-200 bg-blue-50/50 rounded-2xl p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <span className="text-xs text-gray-500 font-semibold uppercase">Semester {targetSemester} Goals</span>
+            <div className="text-2xl font-bold text-gray-900 mt-1">
+              {currentMilestones.filter((m) => m.status === 'done').length} / {currentMilestones.length}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-0.5">Active semester tasks</p>
+          </div>
 
-          <p className="text-blue-800 text-lg">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <span className="text-xs text-gray-500 font-semibold uppercase">Evidence Submissions</span>
+            <div className="text-2xl font-bold text-green-600 mt-1">
+              {user?.evidence ? user.evidence.length : 0}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-0.5">Verified portfolio items</p>
+          </div>
 
-            You haven't added a project to your Evidence Vault this month.
-            Students targeting product companies usually have their first
-            full-stack project by Semester 4.
-            <span className="underline cursor-pointer ml-1">
-              Let's plan one now →
-            </span>
-
-          </p>
-
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <span className="text-xs text-gray-500 font-semibold uppercase">Placement Preparedness</span>
+            <div className="text-2xl font-bold text-indigo-600 mt-1">
+              {user?.reviews && user.reviews.length > 0 ? user.reviews[0].score : '80%'}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-0.5">Current AI Readiness</p>
+          </div>
         </div>
 
-        {/* Stats */}
-
-        <div className="grid grid-cols-4 gap-5 mt-8">
-
-          <div className="bg-white border border-blue-50/50 hover:border-blue-100 shadow-sm rounded-2xl p-6 transition-all">
-            <h2 className="text-5xl font-bold text-blue-600">{percentComplete}%</h2>
-            <p className="text-slate-600 mt-1">Roadmap complete</p>
-          </div>
-
-          <div className="bg-white border border-blue-50/50 hover:border-blue-100 shadow-sm rounded-2xl p-6 transition-all">
-            <h2 className="text-5xl font-bold text-blue-600">{completedMilestones}</h2>
-            <p className="text-slate-600 mt-1">Evidence items</p>
-            <span className="text-green-600 text-sm font-medium">
-              +{completedMilestones} overall
-            </span>
-          </div>
-
-          <div className="bg-white border border-blue-50/50 hover:border-blue-100 shadow-sm rounded-2xl p-6 transition-all">
-            <h2 className="text-5xl font-bold text-blue-600">142</h2>
-            <p className="text-slate-600 mt-1">LeetCode solved</p>
-            <span className="text-green-600 text-sm font-medium">
-              On target
-            </span>
-          </div>
-
-          <div className="bg-white border border-blue-50/50 hover:border-blue-100 shadow-sm rounded-2xl p-6 transition-all">
-            <h2 className="text-5xl font-bold text-blue-600">21</h2>
-            <p className="text-slate-600 mt-1">Day streak</p>
-            <span className="text-orange-500 text-sm font-medium">
-              Keep it up!
-            </span>
-          </div>
-
-        </div>
-
-        {/* Middle */}
-
-        <div className="grid grid-cols-2 gap-6 mt-8">
-
-          {/* Milestones */}
-
-          <div className="bg-white rounded-2xl border border-blue-50/50 p-6 shadow-sm">
-
-            <div className="flex justify-between items-center">
-
-              <h2 className="text-3xl text-slate-800 font-bold">
-                This week's milestones
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+              <h2 className="text-base font-bold text-gray-900">
+                Semester {targetSemester} Milestones
               </h2>
-
-              <button className="text-blue-600 font-semibold cursor-pointer">
-                View all
+              <button
+                onClick={() => navigate('/roadmap')}
+                className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
+              >
+                View all semesters
               </button>
-
             </div>
 
-            <div className="mt-6 space-y-6">
-              {milestonesContent}
-            </div>
-
+            {currentMilestones.length === 0 ? (
+              <div className="text-center py-6 text-gray-500 text-xs">
+                No milestones generated yet.{' '}
+                <Link to="/onboarding" className="text-blue-600 underline">
+                  Run Onboarding Wizard
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {currentMilestones.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 p-2.5 rounded border border-gray-100 hover:bg-gray-50 transition"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={m.status === 'done'}
+                      onChange={() => toggleMilestone(targetSemester, idx)}
+                      className="mt-1 h-4 w-4 rounded text-blue-600 border-gray-300 cursor-pointer"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-xs font-semibold ${
+                        m.status === 'done' ? 'line-through text-gray-400' : 'text-gray-800'
+                      }`}>
+                        {m.task}
+                      </p>
+                      <span className="text-[10px] text-gray-500 mt-0.5 inline-block">
+                        {m.category} • {m.status === 'done' ? 'Completed' : 'Pending'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Semester Progress */}
-
-          <div className="bg-white rounded-2xl border border-blue-50/50 p-6 shadow-sm">
-
-            <div className="flex justify-between items-center">
-
-              <h2 className="text-3xl text-slate-800 font-bold">
-                Semester {targetSemester} progress
+          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+              <h2 className="text-base font-bold text-gray-900">
+                Semester {targetSemester} Domain Progress
               </h2>
-
-              <span className="text-blue-600 font-semibold">
-                Semester {targetSemester} of 8
-              </span>
-
+              <span className="text-xs text-gray-500 font-medium">Semester {targetSemester} of 8</span>
             </div>
 
-            <div className="space-y-8 mt-8">
-
+            <div className="space-y-4">
               <div>
-
-                <div className="flex justify-between text-slate-600 text-sm font-semibold mb-1">
-                  <p>Technical skills</p>
-                  <p>{techStats.completed} / {techStats.total} done</p>
+                <div className="flex justify-between text-xs text-gray-700 font-semibold mb-1">
+                  <span>Technical Skills</span>
+                  <span>{techStats.completed} / {techStats.total} ({techStats.percentage}%)</span>
                 </div>
-
-                <progress
-                  value={techStats.percentage}
-                  max="100"
-                  className="w-full h-2 rounded-full overflow-hidden bg-blue-50 text-blue-600"
-                />
-
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 transition-all"
+                    style={{ width: `${techStats.percentage}%` }}
+                  ></div>
+                </div>
               </div>
 
               <div>
-
-                <div className="flex justify-between text-slate-600 text-sm font-semibold mb-1">
-                  <p>Portfolio building</p>
-                  <p>{portfolioStats.completed} / {portfolioStats.total} done</p>
+                <div className="flex justify-between text-xs text-gray-700 font-semibold mb-1">
+                  <span>Portfolio Building</span>
+                  <span>{portfolioStats.completed} / {portfolioStats.total} ({portfolioStats.percentage}%)</span>
                 </div>
-
-                <progress
-                  value={portfolioStats.percentage}
-                  max="100"
-                  className="w-full h-2 rounded-full overflow-hidden bg-blue-50 text-blue-600"
-                />
-
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-600 transition-all"
+                    style={{ width: `${portfolioStats.percentage}%` }}
+                  ></div>
+                </div>
               </div>
 
               <div>
-
-                <div className="flex justify-between text-slate-600 text-sm font-semibold mb-1">
-                  <p>Placement readiness</p>
-                  <p>{placementStats.completed} / {placementStats.total} done</p>
+                <div className="flex justify-between text-xs text-gray-700 font-semibold mb-1">
+                  <span>Placement Readiness</span>
+                  <span>{placementStats.completed} / {placementStats.total} ({placementStats.percentage}%)</span>
                 </div>
-
-                <progress
-                  value={placementStats.percentage}
-                  max="100"
-                  className="w-full h-2 rounded-full overflow-hidden bg-blue-50 text-blue-600"
-                />
-
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-600 transition-all"
+                    style={{ width: `${placementStats.percentage}%` }}
+                  ></div>
+                </div>
               </div>
-
             </div>
 
+            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+              <span className="text-xs text-gray-600">Need placement practice?</span>
+              <div className="flex gap-2">
+                <Link
+                  to="/resume"
+                  className="text-xs text-blue-600 font-semibold hover:underline"
+                >
+                  Review Resume
+                </Link>
+                <span className="text-gray-300">|</span>
+                <Link
+                  to="/mock"
+                  className="text-xs text-blue-600 font-semibold hover:underline"
+                >
+                  Mock Interview
+                </Link>
+              </div>
+            </div>
           </div>
-
         </div>
 
-        {/* Opportunities */}
-
-        <div className="bg-white rounded-2xl border border-blue-50/50 mt-8 p-6 shadow-sm">
-
-          <div className="flex justify-between items-center">
-
-            <h2 className="text-3xl text-slate-800 font-bold">
-              Upcoming deadlines & opportunities
-            </h2>
-
-            <button className="text-blue-600 font-semibold cursor-pointer">
-              See calendar
-            </button>
-
+        <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-gray-100">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">
+                Upcoming Academic Deadlines & Opportunities
+              </h2>
+              <p className="text-[11px] text-gray-500 mt-0.5">
+                Track internships, hackathons, college exams, and recruitment drives.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsAddingDeadline(!isAddingDeadline)}
+                className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded transition cursor-pointer"
+              >
+                {isAddingDeadline ? 'Cancel' : '+ Add Deadline'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCalendarModal(!showCalendarModal)}
+                className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
+              >
+                {showCalendarModal ? 'Hide calendar' : 'See calendar details'}
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-5 mt-6">
+          {isAddingDeadline && (
+            <form onSubmit={handleAddDeadline} className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="text-xs font-bold text-blue-900 mb-2">Add New Deadline or Opportunity</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <input
+                  type="text"
+                  placeholder="Opportunity or Event title"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="sm:col-span-2 text-xs p-2 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Timeframe (e.g. In 4 days)"
+                  value={newTimeframe}
+                  onChange={(e) => setNewTimeframe(e.target.value)}
+                  className="text-xs p-2 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAddingDeadline(false);
+                    setNewTitle('');
+                    setNewTimeframe('');
+                  }}
+                  className="text-xs px-3 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={deadlineSubmitting}
+                  className="text-xs px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition cursor-pointer disabled:opacity-50"
+                >
+                  {deadlineSubmitting ? 'Saving...' : 'Save Deadline'}
+                </button>
+              </div>
+            </form>
+          )}
 
-            <div className="flex justify-between text-slate-700">
-              <p>Internship applications close (Flipkart & Razorpay)</p>
-              <span className="font-medium text-slate-500">3 days</span>
+          {loadingDeadlines ? (
+            <div className="text-center py-4 text-xs text-gray-500">Loading deadlines...</div>
+          ) : deadlines.length === 0 ? (
+            <div className="text-center py-5 text-xs text-gray-500">
+              No upcoming deadlines logged yet. Click <span className="font-semibold text-blue-600 cursor-pointer" onClick={() => setIsAddingDeadline(true)}>+ Add Deadline</span> to create one.
             </div>
-
-            <div className="flex justify-between text-slate-700">
-              <p>Google Summer of Code: applications open</p>
-              <span className="font-medium text-slate-500">2 weeks</span>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {deadlines.map((item) => (
+                <div key={item._id || item.title} className="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  {editingDeadlineId === item._id ? (
+                    <form onSubmit={(e) => handleUpdateDeadline(item._id, e)} className="w-full flex flex-col sm:flex-row gap-2 items-center">
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="flex-1 text-xs p-1.5 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500"
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={editTimeframe}
+                        onChange={(e) => setEditTimeframe(e.target.value)}
+                        className="w-full sm:w-36 text-xs p-1.5 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500"
+                        required
+                      />
+                      <div className="flex gap-1 shrink-0">
+                        <button
+                          type="submit"
+                          disabled={deadlineSubmitting}
+                          className="text-xs bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded cursor-pointer"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="text-xs border border-gray-300 hover:bg-gray-100 text-gray-700 px-2 py-1 rounded cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                        <span className="text-xs text-gray-800 font-medium">{item.title}</span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                        <span className={`text-[11px] px-2 py-0.5 rounded ${getTimeframeBadgeClass(item.timeframe)}`}>
+                          {item.timeframe}
+                        </span>
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(item)}
+                            className="text-gray-500 hover:text-blue-600 transition cursor-pointer"
+                            title="Edit"
+                          >
+                            Edit
+                          </button>
+                          <span className="text-gray-300">|</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDeadline(item._id)}
+                            className="text-gray-500 hover:text-red-600 transition cursor-pointer"
+                            title="Delete"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
+          )}
 
-            <div className="flex justify-between text-slate-700">
-              <p>Codeforces Round 920: practice contest</p>
-              <span className="font-medium text-slate-500">This Saturday</span>
+          {showCalendarModal && (
+            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded text-xs">
+              <h3 className="font-bold text-gray-800 mb-2">College Academic Calendar Overview</h3>
+              <p className="text-gray-600 mb-2 leading-relaxed">
+                Stay aligned with university examination schedules and company recruitment visit windows.
+                Make sure all portfolio projects are logged in Evidence Vault at least two weeks before campus drive dates.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700">
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="font-semibold block text-gray-900">Odd Semesters (1, 3, 5, 7):</span>
+                  July – December (Hackathons & Coursework focus)
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="font-semibold block text-gray-900">Even Semesters (2, 4, 6, 8):</span>
+                  January – May (Internship & Placement focus)
+                </div>
+              </div>
             </div>
-
-            <div className="flex justify-between text-slate-700">
-              <p>Mid-semester mock interview session</p>
-              <span className="font-medium text-slate-500">Next week</span>
-            </div>
-
-          </div>
-
+          )}
         </div>
-
-      </div>
-
+      </main>
     </div>
   );
 }
